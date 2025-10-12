@@ -1,6 +1,5 @@
 package com.aetheris.app.config;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +25,10 @@ import com.aetheris.app.repo.UserRepository;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private ApiTokenFilter apiTokenFilter;
 
@@ -40,23 +39,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .headers().frameOptions().sameOrigin()
             .and()
             .authorizeRequests()
+            // Public access
             .antMatchers(
-                "/h2-console/**",
-                "/favicon.ico",
+                "/",
                 "/index.html",
+                "/dashboard.html",
                 "/register.html",
                 "/login.html",
-                "/dashboard.html",
+                "/favicon.ico",
                 "/css/**",
                 "/js/**",
-                "/images/**",
-                "/api/users/me",
-                "/api/settings/**",
-                "/api/auth/**"
+                "/images/**"
             ).permitAll()
-            .anyRequest().authenticated()
+            // Secure API endpoints
+            .antMatchers("/api/**").authenticated()
             .and()
-            .addFilterBefore(apiTokenFilter, UsernamePasswordAuthenticationFilter.class); // ✅ add this
+            // Add your token filter before username/password filter
+            .addFilterBefore(apiTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -72,25 +71,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    	auth.userDetailsService(usernameOrEmail -> {
-    	    User user = userRepository.findByUsername(usernameOrEmail)
-    	                  .orElse(userRepository.findByEmail(usernameOrEmail));
-    	    if (user == null) throw new UsernameNotFoundException("User not found");
+        auth.userDetailsService(usernameOrEmail -> {
+            User user = userRepository.findByUsername(usernameOrEmail)
+                    .orElse(userRepository.findByEmail(usernameOrEmail));
+            if (user == null) throw new UsernameNotFoundException("User not found");
 
-    	    // Map roles dynamically
-    	    List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-    	    	    .map(role -> new SimpleGrantedAuthority(role.getName()))
-    	    	    .collect(Collectors.toList());
+            List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                    .map(role -> new SimpleGrantedAuthority(role.getName()))
+                    .collect(Collectors.toList());
 
-    	    return new org.springframework.security.core.userdetails.User(
-    	        user.getUsername(),
-    	        user.getPassword(),
-    	        authorities
-    	    );
-    	}).passwordEncoder(passwordEncoder());
-
+            return new org.springframework.security.core.userdetails.User(
+                    user.getUsername(),
+                    user.getPassword(),
+                    authorities
+            );
+        }).passwordEncoder(passwordEncoder());
     }
-
-
 }
-
