@@ -102,7 +102,7 @@
     <artifactId>smartapi-java</artifactId>
     <version>2.2.5</version>
     <scope>system</scope>
-    <systemPath>${project.basedir}/lib/smartapi-java-2.2.5.jar</systemPath>
+    <systemPath>C:/Users/vrkarputhara/workspace/Aetheris/src/main/resources/lib/smartapi-java-2.2.5.jar</systemPath>
 </dependency>
 
   </dependencies>
