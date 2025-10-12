@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component   // ✅ ADD THIS
+@Component
 public class ApiTokenFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -27,44 +27,31 @@ public class ApiTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtil;
-    
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        // Skip JWT check for public endpoints
-        return path.startsWith("/api/auth") || path.startsWith("/api/test/public");
+
+        return path.startsWith("/api/auth")
+            || path.startsWith("/api/test/public")
+            || path.startsWith("/api/market")
+            || path.startsWith("/h2-console")
+            || path.startsWith("/css")
+            || path.startsWith("/js")
+            || path.startsWith("/images")
+            || path.equals("/")
+            || path.endsWith(".html");
     }
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        // ✅ Skip token check for public endpoints
-        if (path.startsWith("/api/auth") ||
-            path.startsWith("/api/test/public") ||
-            path.startsWith("/h2-console") ||
-            path.startsWith("/css") ||
-            path.startsWith("/js") ||
-            path.startsWith("/images") ||
-            path.equals("/") ||
-            path.endsWith(".html")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        
-        // ✅ Skip for market endpoint
-        if (path.startsWith("/api/market")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 🔒 Token validation logic
         String token = request.getHeader("Authorization");
-        System.out.println("Authorization header: " + token);
+        System.out.println("🔐 Token header: " + token);
+
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
 
@@ -93,9 +80,13 @@ public class ApiTokenFilter extends OncePerRequestFilter {
                 response.getWriter().write("Invalid or expired token");
                 return;
             }
+        } else {
+            // 🚫 If no token is provided and it's a protected endpoint, deny access
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Missing Authorization header");
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
-
 }
