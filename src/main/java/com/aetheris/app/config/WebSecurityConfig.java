@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .headers().frameOptions().sameOrigin()
             .and()
             .authorizeRequests()
-            // Public access
+            // Public access to static pages and H2 console
             .antMatchers(
                 "/",
                 "/index.html",
@@ -49,14 +49,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/favicon.ico",
                 "/css/**",
                 "/js/**",
-                "/images/**"
+                "/images/**",
+                "/h2-console/**"
             ).permitAll()
-            // Secure API endpoints
+            // Public access to authentication APIs
+            .antMatchers(
+                "/api/auth/**"
+            ).permitAll()
+            // Secure everything else under /api/
             .antMatchers("/api/**").authenticated()
             .and()
-            // Add your token filter before username/password filter
             .addFilterBefore(apiTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

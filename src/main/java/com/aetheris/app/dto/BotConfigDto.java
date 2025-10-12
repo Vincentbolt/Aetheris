@@ -1,7 +1,5 @@
 package com.aetheris.app.dto;
 
-import java.time.LocalDate;
-
 import com.aetheris.app.model.BotConfig;
 
 public class BotConfigDto {

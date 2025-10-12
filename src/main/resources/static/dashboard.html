@@ -1327,7 +1327,7 @@
 
     	        if (!response.ok) throw new Error('Failed to fetch bot config');
 
-    	        const config = await response.json();
+    	        const config = await response.json().catch(() => ({}));
     	        if (!config) return;
 
     	        varietySelect.value = config.variety || 'ROBO';
@@ -1421,19 +1421,10 @@
 
         sessionStorage.setItem('botConfig', JSON.stringify(config));
 
-        setButtonLoading(startBotBtn, true, 'Starting...');
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        setButtonLoading(startBotBtn, false);
-        buttonSuccessPulse(startBotBtn);
-
-        updateStatus('active');
-        monitorStatus.textContent = 'Yes';
-
-        const startTime = getCurrentFormattedTime();
-        document.getElementById('botStatusLabel').textContent = 'Started at';
-        document.getElementById('botStatusTime').textContent = startTime;
-
-        showToast('🤖 Bot started successfully!', 'success');
+        await new Promise(resolve => setTimeout(resolve, 600));
+        setButtonLoading(saveConfigBtn, false);
+        buttonSuccessPulse(saveConfigBtn);
+        showToast('✅ Bot configuration saved!', 'success');
 
     	} catch (err) {
         	console.error('Error saving bot config:', err);

@@ -59,13 +59,15 @@ public class BotConfigController {
 
         // Retrieve the BotConfig, if present
         Optional<BotConfig> configOpt = botConfigRepository.findByUser(user);
-        
+
         if (!configOpt.isPresent()) {
-            return ResponseEntity.ok(null); // Return null if no BotConfig found
+            // Return empty DTO instead of null
+            return ResponseEntity.ok(new BotConfigDto());
         }
 
         // Return the BotConfigDto if found
         BotConfig config = configOpt.get();
         return ResponseEntity.ok(new BotConfigDto(config));
     }
+
 }
