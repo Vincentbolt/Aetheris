@@ -1,0 +1,102 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #0d0d0d, #1a1a1a);
+  color: #eee;
+  overflow-x: hidden;
+}
+
+.navbar {
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00e0ff !important;
+  letter-spacing: 1px;
+}
+
+.hero {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d0d0d 20%, #141414 80%);
+  color: white;
+  text-align: center;
+  animation: fadeIn 1.2s ease-in;
+}
+
+.hero h1 {
+  font-weight: 700;
+  color: #00e0ff;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: #bbb;
+}
+
+.card {
+  background: rgba(20, 20, 20, 0.95);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 224, 255, 0.2);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #00e0ff, #0077ff);
+  border: none;
+  transition: background .3s;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #00baff, #0066dd);
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  color: #888;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: #0a0a0a;
+}
+
+/* Animation helpers */
+.animated-bg {
+  background: radial-gradient(circle at 20% 20%, #0f0f0f, #121212 50%, #080808 100%);
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dashboard */
+canvas {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+#tradesList div {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}

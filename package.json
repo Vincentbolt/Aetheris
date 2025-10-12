@@ -1,0 +1,20 @@
+{
+  "name": "aetheris",
+  "version": "1.0.0",
+  "description": "1. Build:\r    mvn clean package\r 2. Run:\r    java -jar target/aetheris-0.0.1-SNAPSHOT.jar\r 3. Open browser:\r    - Landing: http://localhost:8080/\r    - Register: http://localhost:8080/register.html\r    - Login: http://localhost:8080/login.html\r    - Dashboard (after login): http://localhost:8080/dashboard.html\r 4. H2 console (dev): http://localhost:8080/h2-console\r    JDBC URL: jdbc:h2:./data/aetherisdb  User: sa  Password: (blank)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "axios-cookiejar-support": "^6.0.4",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "puppeteer": "^24.23.1",
+    "tough-cookie": "^5.1.2"
+  }
+}
