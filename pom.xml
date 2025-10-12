@@ -17,6 +17,13 @@
     <java.version>1.8</java.version>
   </properties>
 
+<repositories>
+    <repository>
+        <id>local-smartapi-repo</id>
+        <url>file://${project.basedir}/repo</url>
+    </repository>
+</repositories>
+
   <dependencies>
     <!-- Web & JSON -->
     <dependency>
@@ -104,13 +111,6 @@
 </dependency>
 
   </dependencies>
-	
-	<repositories>
-    <repository>
-        <id>local-smartapi-repo</id>
-        <url>file://${project.basedir}/repo</url>
-    </repository>
-</repositories>
 
 
   <build>
