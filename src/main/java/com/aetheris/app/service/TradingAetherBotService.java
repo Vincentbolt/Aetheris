@@ -159,7 +159,7 @@ public class TradingAetherBotService {
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 	            // ✅ If before 9:46, wait until 9:46 to start
 	            if (!strategyStarted && now.isBefore(startTime)) {
-	            	System.out.println("Return in" + "!strategyStarted now.isBeforestartTime");
+	            	System.out.println("Strategy not started yet. Now: " + now + ", StartTime: " + startTime);
 	                return;
 	            }
 
