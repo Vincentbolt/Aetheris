@@ -140,9 +140,9 @@ public class TradingAetherBotService {
 			exchange = botHelper.getExchange(indexType);
 			lotSize = botHelper.getLotSize(indexType);
 			
-			logger.info("Connection Initialized.");
+			System.out.println("Connection Initialized." + existingUser.getUsername());
 		} catch (Exception e) {
-			logger.error("Error in initializeConnection: ", e);
+			System.out.println("Error in initializeConnection: ");
 		}
 		
 		System.setProperty("https.protocols", "TLSv1.2");
@@ -150,13 +150,14 @@ public class TradingAetherBotService {
 	}
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
+		System.out.println("Starting Strategy");
 	    Timer timer = new Timer();
 	    timer.scheduleAtFixedRate(new TimerTask() {
 	        @Override
 	        public void run() {
 	            LocalTime now = LocalTime.now();
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
-
+	            System.out.println("Market is Open");
 	            // ✅ If before 9:46, wait until 9:46 to start
 	            if (!strategyStarted && now.isBefore(startTime)) {
 	                return;
