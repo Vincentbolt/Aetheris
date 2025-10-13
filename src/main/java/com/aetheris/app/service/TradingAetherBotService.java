@@ -716,6 +716,12 @@ public class TradingAetherBotService {
     	stopBot.set(true);
         reached.set(false);       // stops monitoring
         positionTaken.set(false); // resets position
+        if (strategyTimer != null) {
+            strategyTimer.cancel();
+            strategyTimer.purge();
+            logger.info("✅ Strategy timer stopped successfully.");
+        }
+
         logger.info("Trading bot stopped manually.");
     }
     
