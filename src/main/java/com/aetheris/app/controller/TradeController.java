@@ -52,7 +52,7 @@ public class TradeController {
     @GetMapping("/today")
     public ResponseEntity<List<TradeSummaryDto>> getTodayTrades(@RequestParam Long userId,
                                                                 @RequestHeader("Authorization") String authHeader) {
-        System.out.println("Auth Header: " + authHeader);
+        //System.out.println("Auth Header: " + authHeader);
         return ResponseEntity.ok(tradeService.getTodayTrades(userId));
     }
 

@@ -57,7 +57,7 @@ public class ApiTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = request.getHeader("Authorization");
-        System.out.println("🔐 Token header: " + token);
+        //System.out.println("🔐 Token header: " + token);
 
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);

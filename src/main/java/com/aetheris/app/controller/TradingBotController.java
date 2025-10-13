@@ -25,6 +25,7 @@ public class TradingBotController {
 
     @PostMapping("/start")
     public ResponseEntity<String> startBot(@RequestParam Long  userId) {
+    	System.out.println("Trade Bot Started");
         new Thread(() -> botService.startBot(userId)).start();
         return ResponseEntity.ok("Bot started");
     }
