@@ -158,12 +158,25 @@ public class TradingAetherBotService {
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
+		
+		if (scheduler != null && !scheduler.isShutdown()) {
+	        System.out.println("⚠️ Bot is already running. Ignoring new start request.");
+	        return;
+	    }
+		
+		 // ✅ Stop existing scheduler if already running
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        System.out.println("Existing scheduler found. Shutting it down before starting a new one...");
+	        scheduler.shutdownNow();
+	    }
+	    
 		stopBot.set(false);
 		strategyStarted = false;
-		scheduler = Executors.newSingleThreadScheduledExecutor();
+		// ✅ 4️⃣ Create new scheduler and start repeating task
+	    scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	    scheduler.scheduleAtFixedRate(() -> {
-	        	// ✅ Stop condition check
+	        try {
 	            if (stopBot.get()) {
 	            	System.out.println("Bot stop signal received. Cancelling strategy timer...");
 	            	scheduler.shutdownNow();
@@ -203,9 +216,15 @@ public class TradingAetherBotService {
 	                    executeStrategy(smartConnect, userId);
 	                    lastExecutionTime = currentTime;
 	                }
-	            } else {
-	            	System.out.println("Strategy not started yet " + "Market is Closed");
 	            }
+	        } catch (Exception e) {
+	            if (e instanceof InterruptedException) {
+	                System.out.println("Strategy interrupted. Stopping...");
+	                Thread.currentThread().interrupt();
+	            } else {
+	                e.printStackTrace();
+	            }
+	        }
 	    }, 0, 1, TimeUnit.SECONDS);
 	}
 
@@ -232,6 +251,22 @@ public class TradingAetherBotService {
         }
     }
 	
+	/**
+     * Stops the bot gracefully.
+     */
+	public synchronized void stopBot() {
+	    stopBot.set(true);
+	    reached.set(false);
+	    positionTaken.set(false);
+
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        scheduler.shutdownNow();
+	        System.out.println("✅ Strategy scheduler stopped successfully.");
+	    } else {
+	        System.out.println("⚠️ No active scheduler to stop.");
+	    }
+	}
+    
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
 		try {
 			System.out.println("Execute Strategy: " + "Running");
@@ -708,21 +743,7 @@ public class TradingAetherBotService {
 	        return null;
 	    }
 	}
-	
-	/**
-     * Stops the bot gracefully.
-     */
-    public void stopBot() {
-    	stopBot.set(true);
-        reached.set(false);       // stops monitoring
-        positionTaken.set(false); // resets position
-        if (scheduler != null && !scheduler.isShutdown()) {
-        	scheduler.shutdownNow();
-            logger.info("✅ Strategy timer stopped successfully.");
-        }
 
-        logger.info("Trading bot stopped manually.");
-    }
     
     @GetMapping("/api/bot/status")
     @PreAuthorize("hasRole('USER')")
