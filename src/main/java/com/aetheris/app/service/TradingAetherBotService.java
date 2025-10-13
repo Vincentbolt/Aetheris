@@ -1,8 +1,11 @@
 package com.aetheris.app.service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -86,6 +89,7 @@ public class TradingAetherBotService {
 	@Autowired
     private TradeRepository tradeRepository;
 	
+	private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
 	
 	
 	public SmartConnect createSmartConnect(String totpKey, String apiKey, String clientId, String password) {
@@ -140,9 +144,9 @@ public class TradingAetherBotService {
 			exchange = botHelper.getExchange(indexType);
 			lotSize = botHelper.getLotSize(indexType);
 			
-			System.out.println("Connection Initialized." + existingUser.getUsername());
+			logger.info("Connection Initialized.");
 		} catch (Exception e) {
-			System.out.println("Error in initializeConnection: ");
+			logger.error("Error in initializeConnection: ", e);
 		}
 		
 		System.setProperty("https.protocols", "TLSv1.2");
@@ -155,7 +159,7 @@ public class TradingAetherBotService {
 	    timer.scheduleAtFixedRate(new TimerTask() {
 	        @Override
 	        public void run() {
-	            LocalTime now = LocalTime.now();
+	        	LocalTime now = istTimeNow();
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 	            // ✅ If before 9:46, wait until 9:46 to start
 	            if (!strategyStarted && now.isBefore(startTime)) {
@@ -165,15 +169,12 @@ public class TradingAetherBotService {
 
 	            // ✅ Start exactly at 9:46 or the next 5-min multiple after current time
 	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
-	            	System.out.println("Entered in" + "!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
 	                LocalTime nextTriggerTime = getNextTriggerTime(now);
 	                if (now.equals(startTime)) {
-	                	System.out.println("Entered in" + "now.equals(startTime)");
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
 	                } else if (now.equals(nextTriggerTime)) {
-	                	System.out.println("Entered in" + "now.equals(nextTriggerTime)");
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
@@ -182,10 +183,8 @@ public class TradingAetherBotService {
 
 	            // ✅ Continue executing every 5 minutes while market is open
 	            if (strategyStarted && isMarketOpen()) {
-	            	System.out.println("Entered in" + "strategyStarted && isMarketOpen()");
 	                long currentTime = System.currentTimeMillis();
 	                if (currentTime - lastExecutionTime >= cooldownMillis) {
-	                	System.out.println("Entered in" + "currentTime - lastExecutionTime >= cooldownMillis");
 	                    executeStrategy(smartConnect, userId);
 	                    lastExecutionTime = currentTime;
 	                }
@@ -198,7 +197,7 @@ public class TradingAetherBotService {
 	 * ✅ Market open between 09:46 and 15:30
 	 */
 	private boolean isMarketOpen() {
-	    LocalTime now = LocalTime.now();
+		LocalTime now = istTimeNow();
 	    return now.isAfter(LocalTime.of(startHour, startMinutes).minusSeconds(1))
 	            && now.isBefore(LocalTime.of(15, 30));
 	}
@@ -208,24 +207,25 @@ public class TradingAetherBotService {
 	 * Example: 10:03 → 10:06, 10:37 → 10:41, 11:04 → 11:06
 	 */
 	private LocalTime getNextTriggerTime(LocalTime now) {
-	    int minute = now.getMinute();
-	    int nextMultiple = ((minute / intervalMinutes) + 1) * intervalMinutes;
-	    if (nextMultiple >= 60) {
-	        return LocalTime.of(now.getHour() + 1, nextMultiple - 60, 0);
-	    } else {
-	        return LocalTime.of(now.getHour(), nextMultiple, 0);
-	    }
-	}
+        int minute = now.getMinute();
+        int nextMultiple = ((minute / intervalMinutes) + 1) * intervalMinutes;
+        if (nextMultiple >= 60) {
+            return LocalTime.of(now.getHour() + 1, nextMultiple - 60, 0);
+        } else {
+            return LocalTime.of(now.getHour(), nextMultiple, 0);
+        }
+    }
 	
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
 		try {
 			System.out.println("Execute Strategy: " + "Running");
-			long now = System.currentTimeMillis();
+			long nowIstMillis = Instant.now().atZone(ZoneId.of("Asia/Kolkata")).toInstant().toEpochMilli();
+
 			JSONArray firstCandle = null;
 			JSONArray secondCandle = null;
 			
 			// 👇 Throttle fetchNiftyTradeValue() to once every 5 minutes
-			if (now - lastNiftyTradeFetchTime > 5 * 60 * 1000 || cachedNiftyTradeValue == null) {
+			if (nowIstMillis - lastNiftyTradeFetchTime > 5 * 60 * 1000 || cachedNiftyTradeValue == null) {
 				cachedNiftyTradeValue = fetchNiftyTradeValue(smartConnect);
 				if (cachedNiftyTradeValue == null || cachedNiftyTradeValue.length() < 7) {
 					if (cachedNiftyTradeValue != null) {
@@ -236,7 +236,7 @@ public class TradingAetherBotService {
 					cooldownMillis = 1_000L;
 					return; 
 				}
-				lastNiftyTradeFetchTime = now;
+				lastNiftyTradeFetchTime = nowIstMillis;
 				firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
 				logger.info("firstCandle : {}",firstCandle);
 				secondCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 1);
@@ -330,9 +330,9 @@ public class TradingAetherBotService {
 						// 👇 Throttle fetchNiftyValue(optionToken) to once every 5 minutes
 						 JSONArray optionFirstCandle = null;
 						 JSONArray optionSecondCandle = null;
-						if (now - lastOptionDataFetchTime > 5 * 60 * 1000 || cachedOptionData == null) {
+						if (nowIstMillis - lastOptionDataFetchTime > 5 * 60 * 1000 || cachedOptionData == null) {
 						    cachedOptionData = fetchNiftyValue(optionToken, smartConnect);
-						    lastOptionDataFetchTime = now;
+						    lastOptionDataFetchTime = nowIstMillis;
 						    optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
 							logger.info("optionFirstCandle : {}",optionFirstCandle);
 							optionSecondCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 1);
@@ -540,14 +540,14 @@ public class TradingAetherBotService {
 								double marketPr = optionDataCheck.getDouble("ltp");
 								if (marketPr >= targetValue) {
 									capitalUsed = marketPr * quantity;
-									this.updateTradeExit(tradeId, capitalUsed, LocalDateTime.now());
+									this.updateTradeExit(tradeId, capitalUsed, istNow());
 									positionTaken.set(false);
 									reached.set(false);
 									cooldownMillis = 300_000L;
 									break;
 								} else if (marketPr <= stoplossValue) {
 									capitalUsed = marketPr * quantity;
-									this.updateTradeExit(tradeId, capitalUsed, LocalDateTime.now());
+									this.updateTradeExit(tradeId, capitalUsed, istNow());
 									positionTaken.set(false);
 									reached.set(false);
 									cooldownMillis = 300_000L;
@@ -576,7 +576,7 @@ public class TradingAetherBotService {
         trade.setUser(userId);
         trade.setIndexOptionName(niftyString);
         trade.setEntryPrice(entryPrice);
-        trade.setEntryTime(LocalDateTime.now());
+        trade.setEntryTime(istNow());
 
         Trade saved = tradeRepository.save(trade);
         return saved.getId(); // Save this ID to update later
@@ -611,7 +611,7 @@ public class TradingAetherBotService {
 		request.put("symboltoken", token);
 		request.put("interval", "FIVE_MINUTE");
 
-		LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+		LocalDateTime now = istNow().truncatedTo(ChronoUnit.MINUTES);
 		int minutesRounded = (now.getMinute() / 5) * 5;
 		LocalDateTime toTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(now.getHour(), minutesRounded));
 		LocalDateTime fromTime = toTime.minusMinutes(35);
@@ -638,7 +638,7 @@ public class TradingAetherBotService {
 		request.put("symboltoken", optionToken);
 		request.put("interval", "FIVE_MINUTE");
 
-		LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+		LocalDateTime now = istNow().truncatedTo(ChronoUnit.MINUTES);
 		int minutesRounded = (now.getMinute() / 5) * 5;
 		LocalDateTime toTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(now.getHour(), minutesRounded));
 		LocalDateTime fromTime = toTime.minusMinutes(35);
@@ -671,7 +671,7 @@ public class TradingAetherBotService {
 	    request.put("symboltoken", token);
 	    request.put("interval", "FIVE_MINUTE");
 
-	    LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+	    LocalDateTime now = istNow().truncatedTo(ChronoUnit.MINUTES);
 	    int minutesRounded = (now.getMinute() / 5) * 5;
 	    LocalDateTime roundedTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(now.getHour(), minutesRounded));
 
@@ -725,6 +725,18 @@ public class TradingAetherBotService {
         public boolean isPositionTaken() { return positionTaken; }
         public boolean isMonitoring() { return monitoring; }
         public long getCooldownMillis() { return cooldownMillis; }
+    }
+    
+    public static LocalDateTime istNow() {
+        return LocalDateTime.now(IST);
+    }
+
+    public static LocalTime istTimeNow() {
+        return LocalTime.now(IST);
+    }
+
+    public static LocalDate istDateNow() {
+        return LocalDate.now(IST);
     }
     
 }
