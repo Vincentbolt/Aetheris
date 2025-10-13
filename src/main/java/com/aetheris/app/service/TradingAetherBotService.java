@@ -157,6 +157,7 @@ public class TradingAetherBotService {
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
+		stopBot.set(false);
 		strategyTimer = new Timer();
 	    strategyTimer.scheduleAtFixedRate(new TimerTask() {
 	        @Override
@@ -719,6 +720,7 @@ public class TradingAetherBotService {
         if (strategyTimer != null) {
             strategyTimer.cancel();
             strategyTimer.purge();
+            strategyTimer = null;
             logger.info("✅ Strategy timer stopped successfully.");
         }
 
