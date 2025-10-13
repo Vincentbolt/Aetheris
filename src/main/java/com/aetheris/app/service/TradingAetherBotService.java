@@ -114,7 +114,7 @@ public class TradingAetherBotService {
 	}
 	
 	
-	public void startBot(Long userId) {
+	public synchronized boolean startBot(Long userId) {
 		TradingAetherBotService app = new TradingAetherBotService(indServices, botHelper);
 		Optional<User> user = userRepository.findById(userId);
 		User existingUser = user.get();
@@ -150,36 +150,40 @@ public class TradingAetherBotService {
 			System.out.println("Connection Initialized.");
 		} catch (Exception e) {
 			System.out.println("Error in initializeConnection ");
+			return false;
 		}
 		
 		System.setProperty("https.protocols", "TLSv1.2");
 		app.startStrategy(smartConnect, existingUser);
+		return true;
 	}
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
 		
-		if (scheduler != null && !scheduler.isShutdown()) {
+		// ✅ Guard against multiple starts
+	    if (scheduler != null && !scheduler.isShutdown()) {
 	        System.out.println("⚠️ Bot is already running. Ignoring new start request.");
 	        return;
 	    }
-		
-		 // ✅ Stop existing scheduler if already running
-	    if (scheduler != null && !scheduler.isShutdown()) {
-	        System.out.println("Existing scheduler found. Shutting it down before starting a new one...");
-	        scheduler.shutdownNow();
+
+	    // ✅ Reset or clean up old scheduler if needed
+	    if (scheduler != null && scheduler.isShutdown()) {
+	        System.out.println("Cleaning up old scheduler...");
+	        scheduler = null;
 	    }
 	    
 		stopBot.set(false);
 		strategyStarted = false;
 		// ✅ 4️⃣ Create new scheduler and start repeating task
 	    scheduler = Executors.newSingleThreadScheduledExecutor();
-
+	    System.out.println("✅ Scheduler created.");
 	    scheduler.scheduleAtFixedRate(() -> {
 	        try {
-	            if (stopBot.get()) {
-	            	System.out.println("Bot stop signal received. Cancelling strategy timer...");
-	            	scheduler.shutdownNow();
+	        	if (stopBot.get()) {
+	                System.out.println("🛑 Stop signal received. Cancelling strategy...");
+	                scheduler.shutdownNow();
+	                scheduler = null;
 	                return;
 	            }
 	            
@@ -261,6 +265,7 @@ public class TradingAetherBotService {
 
 	    if (scheduler != null && !scheduler.isShutdown()) {
 	        scheduler.shutdownNow();
+	        scheduler = null; // ✅ Clear the reference
 	        System.out.println("✅ Strategy scheduler stopped successfully.");
 	    } else {
 	        System.out.println("⚠️ No active scheduler to stop.");

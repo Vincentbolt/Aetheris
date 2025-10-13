@@ -1896,10 +1896,17 @@
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
           });
+	
+          if (!startRes.ok) {
+        	    const errorText = await startRes.text();
+        	    showToast(errorText, 'error'); // ⚠️ Bot is already running
+        	    setButtonLoading(startBotBtn, false);
+        	    return;
+        	}
 
-          if (!startRes.ok) throw new Error("Failed to start bot");
-          console.log("Bot start API response:", await startRes.text());
-
+          const resultText = await startRes.text();
+          console.log("Bot start API response:", resultText);
+          
           setButtonLoading(startBotBtn, true, 'Starting...');
           await new Promise(resolve => setTimeout(resolve, 1200));
           setButtonLoading(startBotBtn, false);

@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.aetheris.app.model.User;
 import com.aetheris.app.service.TradingAetherBotService;
 
 @RestController
@@ -26,7 +25,12 @@ public class TradingBotController {
     @PostMapping("/start")
     public ResponseEntity<String> startBot(@RequestParam Long  userId) {
     	System.out.println("Trade Bot Started");
-        new Thread(() -> botService.startBot(userId)).start();
+    	boolean started = botService.startBot(userId); // return true if actually started, false if already running
+
+        if (!started) {
+            return ResponseEntity.status(409).body("⚠️ Bot is already running");
+        }
+        
         return ResponseEntity.ok("Bot started");
     }
     
