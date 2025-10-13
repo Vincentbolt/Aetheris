@@ -179,7 +179,7 @@ public class TradingAetherBotService {
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
 	                } else {
-	                	System.out.println("Strategy not started yet. Now: " + "Failed in now.equals(startTime) & now.equals(nextTriggerTime)");
+	                	System.out.println("Strategy not started yet. Now: " + "Failed in now.equals(startTime) & now.equals(nextTriggerTime)" + now + startTime + nextTriggerTime + strategyStarted);
 		            }
 	            } else {
 	            	System.out.println("Strategy not started yet " + "Failed in !strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
