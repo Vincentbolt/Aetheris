@@ -1979,7 +1979,8 @@
 
     	        // ✅ Re-enable Start button after stopping
     	        startBotBtn.disabled = false;
-
+    	        startBotBtn.classList.remove('btn-loading');
+    	        
     	        showToast('🛑 Bot stopped successfully', 'success');
     	        console.log('Bot stopped');
 
