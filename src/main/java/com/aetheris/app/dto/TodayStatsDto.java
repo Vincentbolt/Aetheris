@@ -6,14 +6,16 @@ public class TodayStatsDto {
     private Integer totalTrades;
     private Integer winCount;
     private Double winRatePercent;
+    private Double availableCash;
 
     // Constructor
-    public TodayStatsDto(Double totalProfitLoss, Double capital, Integer totalTrades, Integer winCount, Double winRatePercent) {
+    public TodayStatsDto(Double totalProfitLoss, Double capital, Integer totalTrades, Integer winCount, Double winRatePercent, Double availableCash) {
         this.totalProfitLoss = totalProfitLoss;
         this.capital = capital;
         this.totalTrades = totalTrades;
         this.winCount = winCount;
         this.winRatePercent = winRatePercent;
+        this.availableCash = availableCash;
     }
     
     public Double getTotalProfitLoss() {
@@ -55,5 +57,19 @@ public class TodayStatsDto {
     public void setWinRatePercent(Double winRatePercent) {
         this.winRatePercent = winRatePercent;
     }
+
+	/**
+	 * @return the availableCash
+	 */
+	public Double getAvailableCash() {
+		return availableCash;
+	}
+
+	/**
+	 * @param availableCash the availableCash to set
+	 */
+	public void setAvailableCash(Double availableCash) {
+		this.availableCash = availableCash;
+	}
 }
 

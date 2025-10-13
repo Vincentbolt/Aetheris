@@ -1,6 +1,5 @@
 package com.aetheris.app.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;

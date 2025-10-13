@@ -20,6 +20,8 @@ public class Trade {
 
     private Double entryPrice;
     private Double exitPrice;
+    @Column(name = "available_cash")
+    private Double availableCash = 0.0;
     private LocalDateTime entryTime;
     private LocalDateTime exitTime;
 
@@ -63,6 +65,15 @@ public class Trade {
 
     public Double getExitPrice() {
         return exitPrice;
+    }
+    
+    // Getter & Setter
+    public Double getAvailableCash() {
+        return availableCash;
+    }
+
+    public void setAvailableCash(Double availableCash) {
+        this.availableCash = availableCash;
     }
 
     public void setExitPrice(Double exitPrice) {

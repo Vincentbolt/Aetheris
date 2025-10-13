@@ -2,13 +2,20 @@ package com.aetheris.app.controller;
 
 import com.aetheris.app.dto.LoginRequest;
 import com.aetheris.app.dto.RegisterRequest;
+import com.aetheris.app.model.ApiSettings;
 import com.aetheris.app.model.Role;
+import com.aetheris.app.model.Trade;
 import com.aetheris.app.model.User;
 import com.aetheris.app.repo.RoleRepository;
+import com.aetheris.app.repo.SettingsRepository;
+import com.aetheris.app.repo.TradeRepository;
 import com.aetheris.app.repo.UserRepository;
 import com.aetheris.app.security.JwtUtils;
+import com.aetheris.app.service.TradingAetherBotService;
+import com.angelbroking.smartapi.SmartConnect;
 
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +24,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,6 +51,21 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private SettingsRepository settingsRepository;
+    
+    @Autowired
+    private TradingAetherBotService botService;
+    
+    @Autowired
+    private TradeRepository tradeRepository;
+    
+    private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
+    
+    @Value("${app.mock-rms:false}") // default to false
+    private boolean mockRms;
+    
+    
     
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
@@ -53,7 +77,7 @@ public class AuthController {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists.");
         }
-
+		
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -90,6 +114,48 @@ public class AuthController {
         }
 
         User user = optionalUser.get();
+        
+        // Check if the user has any trade records
+        List<Trade> trades = tradeRepository.findByUser(user);
+        if (trades == null || trades.isEmpty()) {
+        	Trade trade = new Trade();
+        	trade.setUser(user);
+        	trade.setIndexOptionName("DEFAULT"); // or empty string
+        	trade.setEntryPrice(0.0);
+        	trade.setExitPrice(0.0);
+        	trade.setAvailableCash(0.0);
+        	trade.setProfitOrLossPercent(0.0);
+        	trade.setEntryTime(null);
+        	trade.setExitTime(null);
+        	trade.setCreatedAt(LocalDateTime.now(IST));
+
+        	tradeRepository.save(trade);
+        }
+        
+        ApiSettings settings = settingsRepository.findByUser(user).orElse(null);
+        if (settings != null) {
+        	String totpKey = settings.getTotpKey();
+        	String apiKey = settings.getApiKey();
+        	String clientId = settings.getClientId();
+        	String password = settings.getPassword();
+        	double availableCash = 0.0;
+        	
+        	if (mockRms) {
+        	    // Use dummy value in development
+        	    availableCash = 0.0;
+        	} else {
+        	    SmartConnect smartConnect = botService.createSmartConnect(totpKey, apiKey, clientId, password);
+        	    JSONObject response = smartConnect.getRMS();
+
+        	    if (response != null && response.has("availablecash") && !response.isNull("availablecash")) {
+        	        availableCash = Double.parseDouble(response.getString("availablecash"));
+        	    }
+        	}
+        	List<Trade> existingTrades = tradeRepository.findByUser(user);
+        	Trade tradeExist = existingTrades.get(0);
+        	tradeExist.setAvailableCash(availableCash);
+        	tradeRepository.save(tradeExist);
+        }
         
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
         	// Convert roles to GrantedAuthority

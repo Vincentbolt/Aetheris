@@ -9,14 +9,16 @@ public class TradeSummaryDto {
     private Double exitPrice;
     private LocalDateTime entryTime;
     private Double profitOrLossPercent;
+    private Double availableCash;
 
     // Constructor
-    public TradeSummaryDto(String indexOptionName, Double entryPrice, Double exitPrice, LocalDateTime entryTime, Double profitOrLossPercent) {
+    public TradeSummaryDto(String indexOptionName, Double entryPrice, Double exitPrice, LocalDateTime entryTime, Double profitOrLossPercent, Double availableCash) {
         this.indexOptionName = indexOptionName;
         this.entryPrice = entryPrice;
         this.exitPrice = exitPrice;
         this.entryTime = entryTime;
         this.profitOrLossPercent = profitOrLossPercent;
+        this.availableCash = availableCash;
     }
 
     // Static factory method to map from entity
@@ -26,7 +28,8 @@ public class TradeSummaryDto {
             trade.getEntryPrice(),
             trade.getExitPrice(),
             trade.getEntryTime(),
-            trade.getProfitOrLossPercent()
+            trade.getProfitOrLossPercent(),
+            trade.getAvailableCash()
         );
     }
 
@@ -71,4 +74,18 @@ public class TradeSummaryDto {
     public void setProfitOrLossPercent(Double profitOrLossPercent) {
         this.profitOrLossPercent = profitOrLossPercent;
     }
+
+	/**
+	 * @return the availableCash
+	 */
+	public Double getAvailableCash() {
+		return availableCash;
+	}
+
+	/**
+	 * @param availableCash the availableCash to set
+	 */
+	public void setAvailableCash(Double availableCash) {
+		this.availableCash = availableCash;
+	}
 }

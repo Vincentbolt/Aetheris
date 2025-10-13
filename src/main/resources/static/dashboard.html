@@ -1366,10 +1366,10 @@
                 				</svg>
 							</div>
 							<div class="stat-info">
-								<div class="stat-label">Today's P&L</div>
-								<div class="stat-value" style="color: #00e07f;">+₹12,450</div>
-								<div class="stat-change">+2.49%</div>
-							</div>
+								<div class="stat-label">Available Balance</div>
+								<div class="stat-value">45,000</div>
+								<div class="stat-change">In Broker Account</div>
+							</div>		
 						</div>
 
 						<div class="stat-card">
@@ -1411,9 +1411,9 @@
                 					</svg>
 							</div>
 							<div class="stat-info">
-								<div class="stat-label">Active Positions</div>
-								<div class="stat-value">3</div>
-								<div class="stat-change">₹45,000 deployed</div>
+								<div class="stat-label">Today's P&L</div>
+								<div class="stat-value" style="color: #00e07f;">+₹12,450</div>
+								<div class="stat-change">+2.49%</div>
 							</div>
 						</div>
 					</div>
@@ -1543,8 +1543,9 @@
             container.innerHTML += tradeHTML;
         });
 
-        const plElement = document.querySelector(".stat-info .stat-value");
-        const plPercentElement = document.querySelector(".stat-info .stat-change");
+     	// ✅ Update Today's P&L Card
+        const plElement = document.querySelector(".stat-card:nth-child(4) .stat-value");
+        const plPercentElement = document.querySelector(".stat-card:nth-child(4) .stat-change");
 
         if (plElement && plPercentElement) {
             plElement.textContent = `${totalPL >= 0 ? '+' : ''}₹${totalPL.toFixed(2)}`;
@@ -1576,11 +1577,16 @@
         if (!todayResponse.ok) return;
         const todayTrades = await todayResponse.json();
         const todayTradesCount = todayTrades.length;
-
+        const availableCash = allTrades.length > 0 ? allTrades[0].availableCash : 0;
         const winningTradesCount = allTrades.filter(t => t.profitOrLossPercent > 0).length;
-
+	
         const winRatePercent = totalTradesCount > 0 ? ((winningTradesCount / totalTradesCount) * 100).toFixed(1) : 0;
 
+        const availableCashCard = document.querySelectorAll('.stat-info')[0];
+        if (availableCashCard) {
+        	availableCashCard.querySelector('.stat-value').textContent = availableCash;
+        }
+        
         const totalTradesCard = document.querySelectorAll('.stat-info')[1];
         if (totalTradesCard) {
             totalTradesCard.querySelector('.stat-value').textContent = totalTradesCount;
