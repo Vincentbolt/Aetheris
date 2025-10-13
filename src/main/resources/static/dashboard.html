@@ -1907,10 +1907,8 @@
     	        const resultText = await startRes.text();
     	        console.log("Bot start API response:", resultText);
 
-    	        // ✅ Disable start button after click
-    	        startBotBtn.disabled = true;
-
     	        setButtonLoading(startBotBtn, true, 'Starting...');
+    	        startBotBtn.disabled = true;
     	        await new Promise(resolve => setTimeout(resolve, 1200));
     	        setButtonLoading(startBotBtn, false);
     	        buttonSuccessPulse(startBotBtn);
