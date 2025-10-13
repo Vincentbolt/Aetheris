@@ -1892,6 +1892,9 @@
     	        if (!userRes.ok) throw new Error("Failed to fetch user info");
     	        const user = await userRes.json();
 
+    	        // Show loading state
+    	        setButtonLoading(startBotBtn, true, 'Starting...');
+
     	        const startRes = await fetch(`/api/bot/start?userId=${user.id}`, {
     	            method: 'POST',
     	            headers: { 'Authorization': `Bearer ${token}` }
@@ -1907,10 +1910,9 @@
     	        const resultText = await startRes.text();
     	        console.log("Bot start API response:", resultText);
 
-    	        setButtonLoading(startBotBtn, true, 'Starting...');
+    	        // ✅ Disable permanently until bot stops
     	        startBotBtn.disabled = true;
-    	        await new Promise(resolve => setTimeout(resolve, 1200));
-    	        setButtonLoading(startBotBtn, false);
+    	        startBotBtn.classList.remove('btn-loading'); // remove loading effect
     	        buttonSuccessPulse(startBotBtn);
 
     	        updateStatus('active');
@@ -1925,9 +1927,10 @@
     	    } catch (err) {
     	        console.error("Error starting bot:", err);
     	        showToast('⚠️ Error starting bot. Please try again.', 'error');
-    	        setButtonLoading(startBotBtn, false);
+    	        setButtonLoading(startBotBtn, false); // only needed if an error occurs
     	    }
     	});
+
 
       stopBotBtn.addEventListener('click', async () => {
     	    setButtonLoading(stopBotBtn, true, 'Stopping...');
