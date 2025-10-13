@@ -144,9 +144,9 @@ public class TradingAetherBotService {
 			exchange = botHelper.getExchange(indexType);
 			lotSize = botHelper.getLotSize(indexType);
 			
-			logger.info("Connection Initialized.");
+			System.out.println("Connection Initialized.");
 		} catch (Exception e) {
-			logger.error("Error in initializeConnection: ", e);
+			System.out.println("Error in initializeConnection ");
 		}
 		
 		System.setProperty("https.protocols", "TLSv1.2");
@@ -154,7 +154,7 @@ public class TradingAetherBotService {
 	}
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
-		logger.info("Starting Strategy");
+		System.out.println("Starting Strategy");
 	    Timer timer = new Timer();
 	    timer.scheduleAtFixedRate(new TimerTask() {
 	        @Override
@@ -163,7 +163,7 @@ public class TradingAetherBotService {
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 	            // ✅ If before 9:46, wait until 9:46 to start
 	            if (!strategyStarted && now.isBefore(startTime)) {
-	            	logger.info("Strategy not started yet. Now: " + now + ", StartTime: " + startTime);
+	            	System.out.println("Strategy not started yet. Now: " + now + ", StartTime: " + startTime);
 	                return;
 	            }
 
@@ -179,10 +179,10 @@ public class TradingAetherBotService {
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
 	                } else {
-		            	logger.info("Strategy not started yet. Now: " + "Failed in now.equals(startTime) & now.equals(nextTriggerTime)");
+	                	System.out.println("Strategy not started yet. Now: " + "Failed in now.equals(startTime) & now.equals(nextTriggerTime)");
 		            }
 	            } else {
-	            	logger.info("Strategy not started yet " + "Failed in !strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
+	            	System.out.println("Strategy not started yet " + "Failed in !strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
 	            }
 
 	            // ✅ Continue executing every 5 minutes while market is open
@@ -193,7 +193,7 @@ public class TradingAetherBotService {
 	                    lastExecutionTime = currentTime;
 	                }
 	            } else {
-	            	logger.info("Strategy not started yet " + "Market is Closed");
+	            	System.out.println("Strategy not started yet " + "Market is Closed");
 	            }
 	        }
 	    }, 0, 1000); // check every 1 second
@@ -224,7 +224,7 @@ public class TradingAetherBotService {
 	
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
 		try {
-			logger.info("Execute Strategy: " + "Running");
+			System.out.println("Execute Strategy: " + "Running");
 			long nowIstMillis = Instant.now().atZone(ZoneId.of("Asia/Kolkata")).toInstant().toEpochMilli();
 
 			JSONArray firstCandle = null;
@@ -284,7 +284,7 @@ public class TradingAetherBotService {
 				}
 
 				if(optionType == null) {
-					logger.info("Index Basic Trend pattern not formed.");
+					System.out.println("Index Basic Trend pattern not formed.");
 					cooldownMillis = 1_000L;
 					return;
 				}
