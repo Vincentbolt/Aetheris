@@ -501,9 +501,11 @@ public class TradingAetherBotService {
 							stoplossValue = atTheTimeOption - stoplossValue;
 
 							//  Risk Reward Check
-							if (!botHelper.isRiskRewardFavorable(atTheTimeOption, targetValue, stoplossValue)) {
-								cooldownMillis = 1_000L;
-								return;
+							if (targetPercent == 2.00) {
+								if (!botHelper.isRiskRewardFavorable(atTheTimeOption, targetValue, stoplossValue)) {
+									cooldownMillis = 1_000L;
+									return;
+								}
 							}
 
 
