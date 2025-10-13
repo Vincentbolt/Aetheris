@@ -115,7 +115,6 @@ public class TradingAetherBotService {
 	
 	
 	public synchronized boolean startBot(Long userId) {
-		TradingAetherBotService app = new TradingAetherBotService(indServices, botHelper);
 		Optional<User> user = userRepository.findById(userId);
 		User existingUser = user.get();
 		Optional<BotConfig> configOpt = botConfigRepository.findByUser(existingUser);
@@ -154,7 +153,7 @@ public class TradingAetherBotService {
 		}
 		
 		System.setProperty("https.protocols", "TLSv1.2");
-		app.startStrategy(smartConnect, existingUser);
+		this.startStrategy(smartConnect, existingUser);
 		return true;
 	}
 	
