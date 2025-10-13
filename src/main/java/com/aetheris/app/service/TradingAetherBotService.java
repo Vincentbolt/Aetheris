@@ -59,8 +59,8 @@ public class TradingAetherBotService {
     private long lastOptionDataFetchTime = 0;
     private JSONArray cachedNiftyTradeValue = null;
     private JSONArray cachedOptionData = null;
-    private static int startHour = 9;
-	private static int startMinutes = 46;
+    private static final int startHour = 9;
+    private static final int startMinutes = 46;
 	private boolean checkVolatalityCriteria = false;
 	private String indexType = null;
 	private String expiryDateWithMonthyear = null;
@@ -149,34 +149,36 @@ public class TradingAetherBotService {
 	}
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                LocalTime now = LocalTime.now();
+	    Timer timer = new Timer();
+	    timer.scheduleAtFixedRate(new TimerTask() {
+	        @Override
+	        public void run() {
+	            LocalTime now = LocalTime.now();
+	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 
-                // If it's exactly 09:46:00 and strategy hasn't started yet
-                if (!strategyStarted && now.getHour() == startHour && now.getMinute() == startMinutes) {
-                    executeStrategy(smartConnect, userId);
-                    strategyStarted = true;
-                    lastExecutionTime = System.currentTimeMillis();
-                }
+	            // ✅ Trigger at or after 9:46 if not started yet
+	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
+	                executeStrategy(smartConnect, userId);
+	                strategyStarted = true;
+	                lastExecutionTime = System.currentTimeMillis();
+	            }
 
-                // After initial trigger, run every 5 minutes if market is open
-                if (strategyStarted && isMarketOpen()) {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastExecutionTime >= cooldownMillis) {
-                        executeStrategy(smartConnect, userId);
-                        lastExecutionTime = currentTime;
-                    }
-                }
-            }
-        }, 0, 1000); // check every 1 second
-    }
-	
+	            // ✅ Continue executing every 5 minutes while market is open
+	            if (strategyStarted && isMarketOpen()) {
+	                long currentTime = System.currentTimeMillis();
+	                if (currentTime - lastExecutionTime >= cooldownMillis) {
+	                    executeStrategy(smartConnect, userId);
+	                    lastExecutionTime = currentTime;
+	                }
+	            }
+	        }
+	    }, 0, 1000); // check every 1 second
+	}
+
 	private boolean isMarketOpen() {
 	    LocalTime now = LocalTime.now();
-	    return !now.isBefore(LocalTime.of(startHour, startMinutes)) && now.isBefore(LocalTime.of(15, 30));
+	    return now.isAfter(LocalTime.of(startHour, startMinutes).minusSeconds(1))
+	            && now.isBefore(LocalTime.of(15, 30));
 	}
 	
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
@@ -188,6 +190,15 @@ public class TradingAetherBotService {
 			// 👇 Throttle fetchNiftyTradeValue() to once every 5 minutes
 			if (now - lastNiftyTradeFetchTime > 5 * 60 * 1000 || cachedNiftyTradeValue == null) {
 				cachedNiftyTradeValue = fetchNiftyTradeValue(smartConnect);
+				if (cachedNiftyTradeValue == null || cachedNiftyTradeValue.length() < 7) {
+					if (cachedNiftyTradeValue != null) {
+						logger.info("Not enough candles. Candles Formed: {}", cachedNiftyTradeValue.length());
+					} else {
+						logger.info("Not enough candles.");
+					}
+					cooldownMillis = 1_000L;
+					return; 
+				}
 				lastNiftyTradeFetchTime = now;
 				firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
 				logger.info("firstCandle : {}",firstCandle);
@@ -217,13 +228,15 @@ public class TradingAetherBotService {
 			double firstLow = firstCandle.getDouble(3);
 			double secondHigh = secondCandle.getDouble(2);
 			double secondLow = secondCandle.getDouble(3);
+			double secondOpen = secondCandle.getDouble(1);
+			double secondClose = secondCandle.getDouble(4);
 
 
 			String optionType = null;
 			if (!positionTaken.get()) {
-				if (secondHigh > firstHigh && secondLow > firstLow) {
+				if (secondHigh > firstHigh && secondLow > firstLow && secondClose > secondOpen) {
 					optionType = "CE";
-				} else if (secondLow < firstLow && secondHigh < firstHigh) {
+				} else if (secondLow < firstLow && secondHigh < firstHigh && secondClose < secondOpen) {
 					optionType = "PE";
 				}
 

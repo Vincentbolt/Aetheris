@@ -151,7 +151,7 @@ public class AetherBotHelper {
 
 	
 	public boolean isOptionRSIFilterPassed(double rsiOption) {
-	    if (rsiOption < 50 || !(rsiOption >= 75)) {
+	    if ((rsiOption < 50 || rsiOption > 75) && rsiOption <= 80) {
 	        logger.info("Option RSI filter failed: {}", rsiOption);
 	        return false;
 	    }
@@ -386,6 +386,25 @@ public class AetherBotHelper {
 		//TradingBotUtil.sendTelegramMessage("❌ Stoploss Hit!\n" + "Symbol: " + niftyString + "\nEntry: ₹" + atTheTimeOption + "\nExit: ₹" + marketPr + "\n From AetherBot");	
 	}
 	
+	public void profitTodayHit(String orderId, String buyTimeStamp, String niftyString, double atTheTimeOption, double marketPr, double targetValue, double stoplossValue, int quantity, double capitalUsed, double vwapOption,double optionSecondClose, double rsiOption, double atrValue
+			, double latestSar, double latestClose, double iv, double delta, double gamma, double theta, double vega, double vegaThetaRatio) {
+		double profitlossValue = marketPr - atTheTimeOption;
+		String stringValue = "PROFIT : " + Math.round(profitlossValue * (double)quantity);
+		indHelper.logTradeToCSVForEffStrat(orderId, buyTimeStamp, niftyString, atTheTimeOption, marketPr, targetValue, stoplossValue, "PROFIT", (double)quantity, capitalUsed, stringValue, vwapOption,optionSecondClose, rsiOption, atrValue
+				, latestSar, latestClose,iv,delta,gamma,theta,vega,vegaThetaRatio);
+		logger.info("Target Hit. Entry Price: {} | Exit Price: {}", atTheTimeOption, marketPr);
+		//TradingBotUtil.sendTelegramMessage("🎯 Target Hit!\n" + "Symbol: " + niftyString + "\nEntry: ₹" + atTheTimeOption + "\nExit: ₹" + marketPr + "\n From AetherBot");	
+	}
+	
+	public void StopLossTodayHit(String orderId, String buyTimeStamp, String niftyString, double atTheTimeOption, double marketPr, double targetValue, double stoplossValue, int quantity, double capitalUsed, double vwapOption,double optionSecondClose, double rsiOption, double atrValue
+			, double latestSar, double latestClose, double iv, double delta, double gamma, double theta, double vega, double vegaThetaRatio) {
+		double profitlossValue = atTheTimeOption - marketPr;
+		String stringValue = "LOSS : " + Math.round(profitlossValue * (double)quantity); 
+		indHelper.logTradeToCSVForEffStrat(orderId, buyTimeStamp, niftyString, atTheTimeOption, marketPr, targetValue, stoplossValue, "LOSS", (double)quantity, capitalUsed, stringValue, vwapOption,optionSecondClose, rsiOption, atrValue
+				, latestSar, latestClose,iv,delta,gamma,theta,vega,vegaThetaRatio);
+		logger.info("Stoploss Hit. Entry Price: {} | Exit Price: {}", atTheTimeOption, marketPr);
+		//TradingBotUtil.sendTelegramMessage("❌ Stoploss Hit!\n" + "Symbol: " + niftyString + "\nEntry: ₹" + atTheTimeOption + "\nExit: ₹" + marketPr + "\n From AetherBot");	
+	}
 	
 	public String placeOrder(String niftyString, String token, String transactionType, double price, int quantity, double target, double stoploss,
 			SmartConnect smartConnect, String VARIETY_REGULAR, String exchangeOption, String ORDER_TYPE_LIMIT, String PRODUCT_MIS, String VALIDITY_DAY) {
