@@ -1608,6 +1608,7 @@
       const stopBotBtn = document.getElementById('stopBotBtn');
       const varietySelect = document.getElementById('varietySelect');
       const targetPercent = document.getElementById('targetPercent');
+      const indexTypeSelect = document.getElementById('indexType');
       const stoplossPercent = document.getElementById('stoplossPercent');
       const positionStatus = document.getElementById('positionStatus');
       const monitorStatus = document.getElementById('monitorStatus');
@@ -1645,7 +1646,32 @@
         document.getElementById("hello").textContent = "Hello, Trader";
       });
       
-      async function loadBotConfig() {
+      function toggleFields() {
+    	    if (varietySelect.value === 'NORMAL') {
+    	        targetPercent.disabled = true;
+    	        stoplossPercent.disabled = true;
+    	    } else {
+    	        targetPercent.disabled = false;
+    	        stoplossPercent.disabled = false;
+    	    }
+    	}
+
+    	// Event listener for variety changes (for non-SENSEX)
+    	varietySelect.addEventListener('change', toggleFields);
+
+    	// Event listener for indexType changes
+    	indexTypeSelect.addEventListener('change', () => {
+    	    if (indexTypeSelect.value === 'SENSEX') {
+    	        varietySelect.value = 'NORMAL';
+    	        varietySelect.disabled = true; // disable selection
+    	    } else {
+    	        varietySelect.disabled = false; // enable selection
+    	        varietySelect.value = 'ROBO';   // or leave previous config
+    	    }
+    	    toggleFields();
+    	});
+
+    	async function loadBotConfig() {
     	    const rawToken = localStorage.getItem('token');
     	    if (!rawToken) return;
     	    const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
@@ -1663,14 +1689,25 @@
     	        const config = await response.json().catch(() => ({}));
     	        if (!config) return;
 
-    	        varietySelect.value = config.variety || 'ROBO';
+    	        // Set IndexType first
+    	        indexTypeSelect.value = config.indexType || 'NIFTY';
+
+    	        // Set variety and disable if index is SENSEX
+    	        if (indexTypeSelect.value === 'SENSEX') {
+    	            varietySelect.value = 'NORMAL';
+    	            varietySelect.disabled = true;
+    	        } else {
+    	            varietySelect.value = config.variety || 'ROBO';
+    	            varietySelect.disabled = false;
+    	        }
+
+    	        // Set other fields
     	        document.getElementById('expiryDateInput').value = config.expiryDate || '';
-    	        document.getElementById('indexType').value = config.indexType || 'NIFTY';
     	        document.getElementById('capitalAmount').value = config.capitalAmount || 500000;
     	        targetPercent.value = config.targetPercent || 2;
     	        stoplossPercent.value = config.stoplossPercent || 1;
 
-    	        toggleFields();
+    	        toggleFields(); // adjust target/stoploss based on variety
     	        console.log('Bot config loaded:', config);
     	    } catch (err) {
     	        console.error('Error loading bot config:', err);
@@ -1678,7 +1715,7 @@
     	}
 
     	loadBotConfig();
-
+        
     	function loadCredentials() {
        	const rawToken = localStorage.getItem('token');
        	if (!rawToken) return;
@@ -1819,19 +1856,6 @@
       setTimeout(() => msgDiv.remove(), 2000);
       setTimeout(() => window.location.href = '/login.html', 500);
       });
-
-      function toggleFields() {
-        if (varietySelect.value === 'NORMAL') {
-          targetPercent.disabled = true;
-          stoplossPercent.disabled = true;
-        } else {
-          targetPercent.disabled = false;
-          stoplossPercent.disabled = false;
-        }
-      }
-
-      toggleFields();
-      varietySelect.addEventListener('change', toggleFields);
 
       startBotBtn.addEventListener('click', async () => {
         const rawToken = localStorage.getItem('token');

@@ -32,6 +32,12 @@ public class ApiTokenFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
+        // Skip common static resources
+        if (path.matches(".+\\.(ico|png|jpg|jpeg|gif|svg)$")) {
+            return true;
+        }
+
+        // Skip other public endpoints
         return path.startsWith("/api/auth")
             || path.startsWith("/api/test/public")
             || path.startsWith("/api/market")
@@ -42,6 +48,7 @@ public class ApiTokenFilter extends OncePerRequestFilter {
             || path.equals("/")
             || path.endsWith(".html");
     }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
