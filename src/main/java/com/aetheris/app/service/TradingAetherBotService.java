@@ -54,6 +54,7 @@ public class TradingAetherBotService {
 	private AtomicBoolean positionTaken = new AtomicBoolean(false);
 	private AtomicBoolean reached = new AtomicBoolean(true);
 	private AtomicBoolean stopBot = new AtomicBoolean(false);
+	private Timer strategyTimer;
 	private String token = null;
 	private boolean strategyStarted = false;
     private long lastExecutionTime = 0L;
@@ -76,6 +77,7 @@ public class TradingAetherBotService {
 	private String apiKey = null;
 	private String clientId = null;
 	private String password = null;
+	
 	
 	@Autowired
     private BotConfigRepository botConfigRepository;
@@ -155,10 +157,18 @@ public class TradingAetherBotService {
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
-	    Timer timer = new Timer();
-	    timer.scheduleAtFixedRate(new TimerTask() {
+		strategyTimer = new Timer();
+	    strategyTimer.scheduleAtFixedRate(new TimerTask() {
 	        @Override
 	        public void run() {
+	        	// ✅ Stop condition check
+	            if (stopBot.get()) {
+	            	System.out.println("Bot stop signal received. Cancelling strategy timer...");
+	                strategyTimer.cancel();
+	                strategyTimer.purge();
+	                return;
+	            }
+	            
 	        	LocalTime now = istTimeNow();
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 	            // ✅ If before 9:46, wait until 9:46 to start
