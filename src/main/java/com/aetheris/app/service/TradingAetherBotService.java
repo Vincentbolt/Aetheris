@@ -237,7 +237,7 @@ public class TradingAetherBotService {
 	private boolean isMarketOpen() {
 		LocalTime now = istTimeNow();
 	    return now.isAfter(LocalTime.of(startHour, startMinutes).minusSeconds(1))
-	            && now.isBefore(LocalTime.of(17, 30));
+	            && now.isBefore(LocalTime.of(15, 30));
 	}
 
 	/**

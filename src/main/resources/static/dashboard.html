@@ -1858,129 +1858,135 @@
       });
 
       startBotBtn.addEventListener('click', async () => {
-        const rawToken = localStorage.getItem('token');
-        if (!rawToken) {
-          showToast('⚠️ Missing authentication token. Please log in.', 'error');
-          settingsModal.classList.add('show');
-          settingsBackdrop.classList.add('show');
-          return;
-        }
-
-        const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
-
-        try {
-          const res = await fetch('/api/settings/me', {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-
-          if (!res.ok) throw new Error("Failed to fetch credentials");
-
-          const creds = await res.json();
-          const hasAllCreds = creds.apiKey && creds.clientId && creds.totpKey && creds.password;
-
-          if (!hasAllCreds) {
-            showToast('⚠️ Please complete all required API credentials!', 'error');
-            settingsModal.classList.add('show');
-            settingsBackdrop.classList.add('show');
-            return;
-          }
-
-          const userRes = await fetch('/api/users/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (!userRes.ok) throw new Error("Failed to fetch user info");
-          const user = await userRes.json();
-
-          const startRes = await fetch(`/api/bot/start?userId=${user.id}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-	
-          if (!startRes.ok) {
-        	    const errorText = await startRes.text();
-        	    showToast(errorText, 'error'); // ⚠️ Bot is already running
-        	    setButtonLoading(startBotBtn, false);
-        	    return;
-        	}
-
-          const resultText = await startRes.text();
-          console.log("Bot start API response:", resultText);
-          
-          setButtonLoading(startBotBtn, true, 'Starting...');
-          await new Promise(resolve => setTimeout(resolve, 1200));
-          setButtonLoading(startBotBtn, false);
-          buttonSuccessPulse(startBotBtn);
-
-          updateStatus('active');
-          monitorStatus.textContent = 'Yes';
-          
-          botStartTime = new Date();
-          startLiveBotTimer();
-          
-          showToast('🤖 Bot started successfully!', 'success');
-          console.log('Bot started with config:', sessionStorage.getItem('botConfig'));
-
-        } catch (err) {
-          console.error("Error starting bot:", err);
-          showToast('⚠️ Error starting bot. Please try again.', 'error');
-          setButtonLoading(startBotBtn, false);
-        }
-      });
-
-      stopBotBtn.addEventListener('click', async () => {
-    	  setButtonLoading(stopBotBtn, true, 'Stopping...');
-
-    	  const rawToken = localStorage.getItem('token');
-    	  if (!rawToken) {
-    	    showToast('⚠️ Missing authentication token. Please log in.', 'error');
-    	    settingsModal.classList.add('show');
-    	    settingsBackdrop.classList.add('show');
-    	    setButtonLoading(stopBotBtn, false);
-    	    return;
-    	  }
-
-    	  const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
-
-    	  try {
-    	    const res = await fetch('/api/bot/stop', {
-    	      method: 'POST',
-    	      headers: { 'Authorization': `Bearer ${token}` }
-    	    });
-
-    	    if (!res.ok) throw new Error("Failed to stop bot");
-    	    console.log("Bot stop API response:", await res.text());
-
-    	    await new Promise(resolve => setTimeout(resolve, 800));
-
-    	    setButtonLoading(stopBotBtn, false);
-    	    buttonSuccessPulse(stopBotBtn);
-
-    	    updateStatus('idle');
-    	    monitorStatus.textContent = 'No';
-
-    	    if (botStartTime) {
-    	      const elapsedMs = new Date() - botStartTime;
-    	      const elapsedSeconds = Math.floor(elapsedMs / 1000);
-    	      const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
-    	      const minutes = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
-    	      const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
-    	      const elapsedTime = `${hours}:${minutes}:${seconds}`;
-    	      document.getElementById('botStatusTime').textContent = elapsedTime;
+    	    const rawToken = localStorage.getItem('token');
+    	    if (!rawToken) {
+    	        showToast('⚠️ Missing authentication token. Please log in.', 'error');
+    	        settingsModal.classList.add('show');
+    	        settingsBackdrop.classList.add('show');
+    	        return;
     	    }
 
-    	    clearInterval(botTimerInterval);
-    	    botStartTime = null;
-    	    document.getElementById('botStatusLabel').textContent = 'Stopped';
+    	    const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
 
-    	    showToast('🛑 Bot stopped successfully', 'success');
-    	    console.log('Bot stopped');
-    	    
-    	  } catch (err) {
-    	    console.error("Error stopping bot:", err);
-    	    showToast('⚠️ Error stopping bot. Please try again.', 'error');
-    	    setButtonLoading(stopBotBtn, false);
-    	  }
+    	    try {
+    	        const res = await fetch('/api/settings/me', {
+    	            method: 'GET',
+    	            headers: { 'Authorization': `Bearer ${token}` }
+    	        });
+
+    	        if (!res.ok) throw new Error("Failed to fetch credentials");
+
+    	        const creds = await res.json();
+    	        const hasAllCreds = creds.apiKey && creds.clientId && creds.totpKey && creds.password;
+
+    	        if (!hasAllCreds) {
+    	            showToast('⚠️ Please complete all required API credentials!', 'error');
+    	            settingsModal.classList.add('show');
+    	            settingsBackdrop.classList.add('show');
+    	            return;
+    	        }
+
+    	        const userRes = await fetch('/api/users/me', {
+    	            headers: { 'Authorization': `Bearer ${token}` }
+    	        });
+    	        if (!userRes.ok) throw new Error("Failed to fetch user info");
+    	        const user = await userRes.json();
+
+    	        const startRes = await fetch(`/api/bot/start?userId=${user.id}`, {
+    	            method: 'POST',
+    	            headers: { 'Authorization': `Bearer ${token}` }
+    	        });
+
+    	        if (!startRes.ok) {
+    	            const errorText = await startRes.text();
+    	            showToast(errorText, 'error'); // ⚠️ Bot is already running
+    	            setButtonLoading(startBotBtn, false);
+    	            return;
+    	        }
+
+    	        const resultText = await startRes.text();
+    	        console.log("Bot start API response:", resultText);
+
+    	        // ✅ Disable start button after click
+    	        startBotBtn.disabled = true;
+
+    	        setButtonLoading(startBotBtn, true, 'Starting...');
+    	        await new Promise(resolve => setTimeout(resolve, 1200));
+    	        setButtonLoading(startBotBtn, false);
+    	        buttonSuccessPulse(startBotBtn);
+
+    	        updateStatus('active');
+    	        monitorStatus.textContent = 'Yes';
+
+    	        botStartTime = new Date();
+    	        startLiveBotTimer();
+
+    	        showToast('🤖 Bot started successfully!', 'success');
+    	        console.log('Bot started with config:', sessionStorage.getItem('botConfig'));
+
+    	    } catch (err) {
+    	        console.error("Error starting bot:", err);
+    	        showToast('⚠️ Error starting bot. Please try again.', 'error');
+    	        setButtonLoading(startBotBtn, false);
+    	    }
+    	});
+
+      stopBotBtn.addEventListener('click', async () => {
+    	    setButtonLoading(stopBotBtn, true, 'Stopping...');
+
+    	    const rawToken = localStorage.getItem('token');
+    	    if (!rawToken) {
+    	        showToast('⚠️ Missing authentication token. Please log in.', 'error');
+    	        settingsModal.classList.add('show');
+    	        settingsBackdrop.classList.add('show');
+    	        setButtonLoading(stopBotBtn, false);
+    	        return;
+    	    }
+
+    	    const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
+
+    	    try {
+    	        const res = await fetch('/api/bot/stop', {
+    	            method: 'POST',
+    	            headers: { 'Authorization': `Bearer ${token}` }
+    	        });
+
+    	        if (!res.ok) throw new Error("Failed to stop bot");
+    	        console.log("Bot stop API response:", await res.text());
+
+    	        await new Promise(resolve => setTimeout(resolve, 800));
+
+    	        setButtonLoading(stopBotBtn, false);
+    	        buttonSuccessPulse(stopBotBtn);
+
+    	        updateStatus('idle');
+    	        monitorStatus.textContent = 'No';
+
+    	        if (botStartTime) {
+    	            const elapsedMs = new Date() - botStartTime;
+    	            const elapsedSeconds = Math.floor(elapsedMs / 1000);
+    	            const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
+    	            const minutes = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+    	            const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+    	            const elapsedTime = `${hours}:${minutes}:${seconds}`;
+    	            document.getElementById('botStatusTime').textContent = elapsedTime;
+    	        }
+
+    	        clearInterval(botTimerInterval);
+    	        botStartTime = null;
+    	        document.getElementById('botStatusLabel').textContent = 'Stopped';
+
+    	        // ✅ Re-enable Start button after stopping
+    	        startBotBtn.disabled = false;
+
+    	        showToast('🛑 Bot stopped successfully', 'success');
+    	        console.log('Bot stopped');
+
+    	    } catch (err) {
+    	        console.error("Error stopping bot:", err);
+    	        showToast('⚠️ Error stopping bot. Please try again.', 'error');
+    	        setButtonLoading(stopBotBtn, false);
+    	    }
     	});
 
 
