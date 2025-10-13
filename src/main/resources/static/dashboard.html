@@ -405,47 +405,46 @@
       margin-top: 10px;
     }
 
-   #tradesList {
-  max-height: calc(100% - 50px); /* subtract space for title/margin */
-  overflow-y: auto;
-  padding-right: 10px;
-}
+    #tradesList {
+      max-height: calc(100% - 50px);
+      overflow-y: auto;
+      padding-right: 10px;
+    }
 
-#tradesList::-webkit-scrollbar {
-  width: 6px;
-}
+    #tradesList::-webkit-scrollbar {
+      width: 6px;
+    }
 
-#tradesList::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
+    #tradesList::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
 
-#tradesList::-webkit-scrollbar-thumb {
-  background: rgba(0, 224, 255, 0.3);
-  border-radius: 10px;
-}
+    #tradesList::-webkit-scrollbar-thumb {
+      background: rgba(0, 224, 255, 0.3);
+      border-radius: 10px;
+    }
 
-#tradesList::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 224, 255, 0.5);
-}
+    #tradesList::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 224, 255, 0.5);
+    }
 
-.trade-item {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-left: 3px solid #00e0ff;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 12px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
+    .trade-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #00e0ff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
 
-.trade-item:hover {
-  transform: translateX(8px);
-  background: rgba(0, 224, 255, 0.08);
-  border-left-color: #0077ff;
-}
-
+    .trade-item:hover {
+      transform: translateX(8px);
+      background: rgba(0, 224, 255, 0.08);
+      border-left-color: #0077ff;
+    }
 
     .status-badge {
       display: inline-flex;
@@ -510,7 +509,6 @@
       font-size: 1rem;
     }
 
-    /* Modal Styles */
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -683,7 +681,6 @@
       75% { transform: translateY(-4px); }
     }
 
-    /* Toast notification */
     .toast-notification {
       position: fixed;
       bottom: 30px;
@@ -783,48 +780,383 @@
     }
 
     @media (max-width: 768px) {
+      body::before,
+      body::after {
+        width: 400px;
+        height: 400px;
+      }
+
       .navbar {
-        padding: 1rem;
+        padding: 0.875rem 1rem;
+        border-radius: 0 0 20px 20px;
       }
 
       .navbar-brand {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+        letter-spacing: 1.5px;
       }
 
       .nav-actions {
-        gap: 8px;
+        gap: 6px;
       }
 
       .btn-settings {
-        padding: 8px 16px;
-        font-size: 0.85rem;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        border-radius: 10px;
+      }
+
+      .btn-settings svg {
+        width: 14px;
+        height: 14px;
       }
 
       #logoutBtn {
-        padding: 8px 16px;
-        font-size: 0.85rem;
+        padding: 6px 14px;
+        font-size: 0.75rem;
+        border-radius: 10px;
       }
 
       main {
-        padding: 1rem 0.5rem;
+        padding: 1rem 0.75rem;
+      }
+
+      .row {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .col-lg-4 {
+        order: 1;
+        animation-delay: 0s !important;
+      }
+
+      .col-lg-8 {
+        order: 2;
+        animation-delay: 0.15s !important;
+        margin-top: 1rem;
       }
 
       .glass-card {
-        padding: 1.5rem;
-        border-radius: 20px;
+        padding: 1.25rem;
+        border-radius: 18px;
+        margin-bottom: 1rem;
+        animation: mobileSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      @keyframes mobileSlideUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .glass-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .glass-card:active {
+        transform: scale(0.98);
       }
 
       #hello {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
+        margin-bottom: 0.75rem;
+      }
+
+      #capital {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
       }
 
       .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
+        margin: 1.25rem 0;
       }
 
       .stat-card {
         padding: 1rem;
+        border-radius: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, rgba(0, 224, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .stat-card:active::before {
+        opacity: 1;
+      }
+
+      .stat-card:active {
+        transform: scale(0.96);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(0, 224, 255, 0.3);
+        box-shadow: 0 8px 25px rgba(0, 224, 255, 0.15);
+      }
+
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 8px;
+        transition: transform 0.3s ease;
+      }
+
+      .stat-card:active .stat-icon {
+        transform: scale(1.1) rotate(5deg);
+      }
+
+      .stat-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .stat-info {
+        width: 100%;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+      }
+
+      .stat-value {
+        font-size: 1.35rem;
+        margin-bottom: 2px;
+      }
+
+      .stat-change {
+        font-size: 0.7rem;
+      }
+
+      #marketStatus {
+        font-size: 0.9rem;
+        padding: 10px;
+        margin-top: 12px;
+        border-radius: 10px;
+      }
+
+      .glass-card[style*="height: 626px"] {
+        height: 450px !important;
+      }
+
+      .card-title {
+        font-size: 1.15rem;
+        margin-bottom: 1rem;
+      }
+
+      .card-title::before {
+        width: 3px;
+        height: 20px;
+      }
+
+      #tradesList {
+        padding-right: 8px;
+      }
+
+      .trade-item {
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        animation: tradeSlideIn 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .trade-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.1), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+      }
+
+      .trade-item:active::after {
+        transform: translateX(100%);
+      }
+
+      @keyframes tradeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .trade-item:active {
+        transform: translateX(6px) scale(0.98);
+        box-shadow: 0 6px 20px rgba(0, 224, 255, 0.2);
+      }
+
+      .form-group label {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+      }
+
+      .form-control {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 224, 255, 0.15);
+      }
+
+      .btn {
+        padding: 11px 20px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+
+      .btn:active::after {
+        width: 300px;
+        height: 300px;
+      }
+
+      .btn:active {
+        transform: scale(0.95);
+      }
+
+      .info-row {
+        padding: 10px 0;
+        transition: all 0.3s ease;
+      }
+
+      .info-row:active {
+        background: rgba(0, 224, 255, 0.05);
+        border-radius: 8px;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .info-label {
+        font-size: 0.85rem;
+      }
+
+      .info-value {
+        font-size: 0.95rem;
+      }
+
+      .status-badge {
+        padding: 7px 14px;
+        font-size: 0.8rem;
+        border-radius: 18px;
+        transition: all 0.3s ease;
+      }
+
+      .status-badge:active {
+        transform: scale(1.05);
+      }
+
+      .status-indicator {
+        width: 7px;
+        height: 7px;
+      }
+
+      .settings-modal {
+        padding: 2rem 1.5rem;
+        width: 95%;
+        max-height: 85vh;
+        border-radius: 20px;
+      }
+
+      .modal-title {
+        font-size: 1.35rem;
+      }
+
+      .modal-close {
+        width: 32px;
+        height: 32px;
+        font-size: 1.3rem;
+        transition: all 0.3s ease;
+      }
+
+      .modal-close:active {
+        transform: rotate(90deg) scale(0.9);
+      }
+
+      .section-title {
+        font-size: 1rem;
+      }
+
+      .toast-notification {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        min-width: unset;
+        padding: 14px 18px;
+        font-size: 0.85rem;
+        box-shadow: 0 10px 40px rgba(0, 224, 255, 0.3);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.3rem;
+        letter-spacing: 1.2px;
+      }
+
+      .glass-card {
+        padding: 1.125rem;
+        border-radius: 16px;
+      }
+
+      #hello {
+        font-size: 1.4rem;
+      }
+
+      #capital {
+        font-size: 0.9rem;
+      }
+
+      .stats-grid {
+        gap: 0.65rem;
+      }
+
+      .stat-card {
+        padding: 0.875rem;
       }
 
       .stat-icon {
@@ -832,36 +1164,50 @@
         height: 40px;
       }
 
-      .stat-icon svg {
-        width: 20px;
-        height: 20px;
-      }
-
       .stat-value {
-        font-size: 1.2rem;
-      }
-
-      .settings-modal {
-        padding: 2rem 1.5rem;
-        width: 95%;
-      }
-
-      .modal-title {
-        font-size: 1.3rem;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .glass-card {
-        padding: 1.25rem;
+        font-size: 1.25rem;
       }
 
       .card-title {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
       }
 
       .settings-modal {
         padding: 1.5rem 1rem;
+        border-radius: 18px;
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+      }
+
+      .form-control {
+        font-size: 0.875rem;
+      }
+
+      .btn {
+        font-size: 0.875rem;
+        padding: 10px 18px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .navbar {
+        padding: 0.75rem 0.875rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .stat-icon {
+        margin-bottom: 0;
       }
     }
   </style>
@@ -1119,7 +1465,7 @@
 
     function startLiveBotTimer() {
     	  botStartTime = new Date();
-    	  clearInterval(botTimerInterval); // stops previous timer if any
+    	  clearInterval(botTimerInterval);
 
     	  document.getElementById('botStatusLabel').textContent = 'Running';
     	  botTimerInterval = setInterval(() => {
@@ -1138,7 +1484,6 @@
         if (!rawToken) return;
         const jwtToken = rawToken.startsWith("Bearer ") ? rawToken.substring(7) : rawToken;
 
-        // Replace with actual user ID (from /api/users/me)
         fetch('/api/users/me', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
@@ -1147,7 +1492,6 @@
     	loadTodayTrades(user.id, jwtToken);
     	updateTradeStats(user.id, jwtToken);
 
-    	// ✅ Refresh every 5 second
     	setInterval(() => {
         loadTodayTrades(user.id, jwtToken);
         updateTradeStats(user.id, jwtToken);
@@ -1176,7 +1520,6 @@
         let totalInvestment = 0;
 
         trades.forEach(trade => {
-            // Calculate total P&L
             const profitOrLoss = trade.exitPrice - trade.entryPrice;
             totalPL += profitOrLoss;
             totalInvestment += trade.entryPrice;
@@ -1200,7 +1543,6 @@
             container.innerHTML += tradeHTML;
         });
 
-        // Update Today's P&L
         const plElement = document.querySelector(".stat-info .stat-value");
         const plPercentElement = document.querySelector(".stat-info .stat-change");
 
@@ -1209,12 +1551,11 @@
             const plPercent = totalInvestment > 0 ? (totalPL / totalInvestment) * 100 : 0;
             plPercentElement.textContent = `${plPercent >= 0 ? '+' : ''}${plPercent.toFixed(2)}%`;
         }
-     	// Set color dynamically
         if (totalPL >= 0) {
-            plElement.style.color = "#00e07f";       // Green for profit
+            plElement.style.color = "#00e07f";
             plPercentElement.style.color = "#00e07f";
         } else {
-            plElement.style.color = "#ff4444";       // Red for loss
+            plElement.style.color = "#ff4444";
             plPercentElement.style.color = "#ff4444";
         }
     }
@@ -1222,7 +1563,6 @@
     async function updateTradeStats(userId, token) {
         if (!userId || !token) return;
 
-        // Fetch all trades for user
         const allResponse = await fetch(`/api/trade/all?userId=${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1230,7 +1570,6 @@
         const allTrades = await allResponse.json();
         const totalTradesCount = allTrades.length;
 
-        // Fetch today's trades
         const todayResponse = await fetch(`/api/trade/today?userId=${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1238,21 +1577,17 @@
         const todayTrades = await todayResponse.json();
         const todayTradesCount = todayTrades.length;
 
-        // Count winning trades
         const winningTradesCount = allTrades.filter(t => t.profitOrLossPercent > 0).length;
 
-        // Calculate win rate %
         const winRatePercent = totalTradesCount > 0 ? ((winningTradesCount / totalTradesCount) * 100).toFixed(1) : 0;
 
-        // Update Total Trades card
-        const totalTradesCard = document.querySelectorAll('.stat-info')[1]; // second card = Total Trades
+        const totalTradesCard = document.querySelectorAll('.stat-info')[1];
         if (totalTradesCard) {
             totalTradesCard.querySelector('.stat-value').textContent = totalTradesCount;
             totalTradesCard.querySelector('.stat-change').textContent = `${todayTradesCount} today`;
         }
 
-        // Update Win Rate card
-        const winRateCard = document.querySelectorAll('.stat-info')[2]; // third card = Win Rate
+        const winRateCard = document.querySelectorAll('.stat-info')[2];
         if (winRateCard) {
             winRateCard.querySelector('.stat-value').textContent = `${winRatePercent}%`;
             winRateCard.querySelector('.stat-change').textContent = `${winningTradesCount}/${totalTradesCount} wins`;
@@ -1281,10 +1616,8 @@
       let cooldownTimer = null;
       let cooldownTime = 0;
 
-      // Load saved credentials
       loadCredentials();
 
-      // Open settings modal
       settingsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         console.log('Settings button clicked!');
@@ -1346,8 +1679,7 @@
 
     	loadBotConfig();
 
-    	// Load credentials from storage
-        function loadCredentials() {
+    	function loadCredentials() {
        	const rawToken = localStorage.getItem('token');
        	if (!rawToken) return;
 
@@ -1374,7 +1706,6 @@
         .catch(err => console.error("Error loading settings:", err));
         }
       
-      // Close settings modal
       function closeModal() {
         settingsModal.classList.remove('show');
         settingsBackdrop.classList.remove('show');
@@ -1384,7 +1715,6 @@
       closeSettings.addEventListener('click', closeModal);
       settingsBackdrop.addEventListener('click', closeModal);
 
-      // Save bot config handler
       saveConfigBtn.addEventListener('click', async () => {
     		const config = {
         	variety: varietySelect.value,
@@ -1424,7 +1754,7 @@
         await new Promise(resolve => setTimeout(resolve, 600));
         setButtonLoading(saveConfigBtn, false);
         buttonSuccessPulse(saveConfigBtn);
-        showToast('✅ Bot configuration saved!', 'success');
+        showToast('Bot configuration saved!', 'success');
 
     	} catch (err) {
         	console.error('Error saving bot config:', err);
@@ -1433,7 +1763,6 @@
     	}
 		});
    
-      // Save credentials
       saveCredentialsBtn.addEventListener('click', async () => {
     	const credentials = {
         		apiKey: document.getElementById('apiKey').value,
@@ -1479,8 +1808,6 @@
         }
      });
 
-
-      // Logout handler
       logoutBtn.addEventListener('click', () => {
       sessionStorage.removeItem('apiCredentials');
 
@@ -1493,7 +1820,6 @@
       setTimeout(() => window.location.href = '/login.html', 500);
       });
 
-      // Toggle target/stoploss based on variety
       function toggleFields() {
         if (varietySelect.value === 'NORMAL') {
           targetPercent.disabled = true;
@@ -1507,7 +1833,6 @@
       toggleFields();
       varietySelect.addEventListener('change', toggleFields);
 
-   	  // Start bot handler
       startBotBtn.addEventListener('click', async () => {
         const rawToken = localStorage.getItem('token');
         if (!rawToken) {
@@ -1520,7 +1845,6 @@
         const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
 
         try {
-          // Step 1: Verify credentials
           const res = await fetch('/api/settings/me', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
@@ -1538,14 +1862,12 @@
             return;
           }
 
-          // ✅ Step 2: Get current user ID
           const userRes = await fetch('/api/users/me', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (!userRes.ok) throw new Error("Failed to fetch user info");
           const user = await userRes.json();
 
-          // ✅ Step 3: Send request to start the bot
           const startRes = await fetch(`/api/bot/start?userId=${user.id}`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
@@ -1554,7 +1876,6 @@
           if (!startRes.ok) throw new Error("Failed to start bot");
           console.log("Bot start API response:", await startRes.text());
 
-          // ✅ Step 4: UI updates and feedback
           setButtonLoading(startBotBtn, true, 'Starting...');
           await new Promise(resolve => setTimeout(resolve, 1200));
           setButtonLoading(startBotBtn, false);
@@ -1576,8 +1897,6 @@
         }
       });
 
-
-      // Stop bot handler
       stopBotBtn.addEventListener('click', async () => {
         setButtonLoading(stopBotBtn, true, 'Stopping...');
         
@@ -1603,11 +1922,10 @@
         botStartTime = null;
         document.getElementById('botStatusLabel').textContent = 'Stopped';
 
-        showToast('⏹️ Bot stopped successfully', 'success');
+        showToast('Bot stopped successfully', 'success');
         console.log('Bot stopped');
       });
 
-      // Update status badge
       function updateStatus(status) {
         if (status === 'active') {
           positionStatus.className = 'status-badge status-active';
@@ -1618,8 +1936,6 @@
         }
       }
 
-
-      // Button loading animation
       function setButtonLoading(button, isLoading, text = '') {
         if (isLoading) {
           button.dataset.originalText = button.textContent;
@@ -1633,13 +1949,11 @@
         }
       }
 
-      // Button success pulse animation
       function buttonSuccessPulse(button) {
         button.classList.add('btn-success-pulse');
         setTimeout(() => button.classList.remove('btn-success-pulse'), 600);
       }
 
-      // Toast notification
       function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `toast-notification toast-${type}`;
