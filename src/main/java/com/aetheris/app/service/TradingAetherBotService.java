@@ -11,8 +11,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.json.JSONArray;
@@ -54,7 +55,7 @@ public class TradingAetherBotService {
 	private AtomicBoolean positionTaken = new AtomicBoolean(false);
 	private AtomicBoolean reached = new AtomicBoolean(true);
 	private AtomicBoolean stopBot = new AtomicBoolean(false);
-	private Timer strategyTimer;
+	private ScheduledExecutorService scheduler;
 	private String token = null;
 	private boolean strategyStarted = false;
     private long lastExecutionTime = 0L;
@@ -158,15 +159,14 @@ public class TradingAetherBotService {
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
 		stopBot.set(false);
-		strategyTimer = new Timer();
-	    strategyTimer.scheduleAtFixedRate(new TimerTask() {
-	        @Override
-	        public void run() {
+		strategyStarted = false;
+		scheduler = Executors.newSingleThreadScheduledExecutor();
+
+	    scheduler.scheduleAtFixedRate(() -> {
 	        	// ✅ Stop condition check
 	            if (stopBot.get()) {
 	            	System.out.println("Bot stop signal received. Cancelling strategy timer...");
-	                strategyTimer.cancel();
-	                strategyTimer.purge();
+	            	scheduler.shutdownNow();
 	                return;
 	            }
 	            
@@ -206,8 +206,7 @@ public class TradingAetherBotService {
 	            } else {
 	            	System.out.println("Strategy not started yet " + "Market is Closed");
 	            }
-	        }
-	    }, 0, 1000); // check every 1 second
+	    }, 0, 1, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -717,10 +716,8 @@ public class TradingAetherBotService {
     	stopBot.set(true);
         reached.set(false);       // stops monitoring
         positionTaken.set(false); // resets position
-        if (strategyTimer != null) {
-            strategyTimer.cancel();
-            strategyTimer.purge();
-            strategyTimer = null;
+        if (scheduler != null && !scheduler.isShutdown()) {
+        	scheduler.shutdownNow();
             logger.info("✅ Strategy timer stopped successfully.");
         }
 
