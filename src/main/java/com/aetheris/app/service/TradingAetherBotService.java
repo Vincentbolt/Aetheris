@@ -61,6 +61,7 @@ public class TradingAetherBotService {
     private JSONArray cachedOptionData = null;
     private static final int startHour = 9;
     private static final int startMinutes = 46;
+    private static final int intervalMinutes = 5;
 	private boolean checkVolatalityCriteria = false;
 	private String indexType = null;
 	private String expiryDateWithMonthyear = null;
@@ -156,11 +157,23 @@ public class TradingAetherBotService {
 	            LocalTime now = LocalTime.now();
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
 
-	            // ✅ Trigger at or after 9:46 if not started yet
+	            // ✅ If before 9:46, wait until 9:46 to start
+	            if (!strategyStarted && now.isBefore(startTime)) {
+	                return;
+	            }
+
+	            // ✅ Start exactly at 9:46 or the next 5-min multiple after current time
 	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
-	                executeStrategy(smartConnect, userId);
-	                strategyStarted = true;
-	                lastExecutionTime = System.currentTimeMillis();
+	                LocalTime nextTriggerTime = getNextTriggerTime(now);
+	                if (now.equals(startTime)) {
+	                    executeStrategy(smartConnect, userId);
+	                    strategyStarted = true;
+	                    lastExecutionTime = System.currentTimeMillis();
+	                } else if (now.equals(nextTriggerTime)) {
+	                    executeStrategy(smartConnect, userId);
+	                    strategyStarted = true;
+	                    lastExecutionTime = System.currentTimeMillis();
+	                }
 	            }
 
 	            // ✅ Continue executing every 5 minutes while market is open
@@ -175,10 +188,27 @@ public class TradingAetherBotService {
 	    }, 0, 1000); // check every 1 second
 	}
 
+	/**
+	 * ✅ Market open between 09:46 and 15:30
+	 */
 	private boolean isMarketOpen() {
 	    LocalTime now = LocalTime.now();
 	    return now.isAfter(LocalTime.of(startHour, startMinutes).minusSeconds(1))
 	            && now.isBefore(LocalTime.of(15, 30));
+	}
+
+	/**
+	 * ✅ Get next 5-minute interval after current time
+	 * Example: 10:03 → 10:06, 10:37 → 10:41, 11:04 → 11:06
+	 */
+	private LocalTime getNextTriggerTime(LocalTime now) {
+	    int minute = now.getMinute();
+	    int nextMultiple = ((minute / intervalMinutes) + 1) * intervalMinutes;
+	    if (nextMultiple >= 60) {
+	        return LocalTime.of(now.getHour() + 1, nextMultiple - 60, 0);
+	    } else {
+	        return LocalTime.of(now.getHour(), nextMultiple, 0);
+	    }
 	}
 	
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
