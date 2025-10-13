@@ -319,6 +319,7 @@ public class TradingAetherBotService {
 					niftyString = indServices.generateNiftyString(indexType, strikeOption, expiryDateWithMonthyear);
 					optionToken = indServices.getToken(niftyString);
 					if (optionToken != null && !stopBot.get()) {
+						 targetPercent = 2.0;
 						// 👇 Throttle fetchNiftyValue(optionToken) to once every 5 minutes
 						 JSONArray optionFirstCandle = null;
 						 JSONArray optionSecondCandle = null;
@@ -486,6 +487,10 @@ public class TradingAetherBotService {
 								logger.warn("Strike price {} not found in the response.", optionSTrikePrice);
 							}
 
+							if (atTheTimeOption < 80) {
+								targetPercent = 1.0;
+							}
+							
 							double targetValue = 0.0, stoplossValue = 0.0;
 							targetValue = Math.round(atTheTimeOption * (targetPercent / 100) * 100.0) / 100.0;
 							stoplossValue = Math.round(atTheTimeOption * (stoplossPercent / 100) * 100.0) / 100.0;
