@@ -1922,33 +1922,60 @@
       });
 
       stopBotBtn.addEventListener('click', async () => {
-        setButtonLoading(stopBotBtn, true, 'Stopping...');
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        setButtonLoading(stopBotBtn, false);
-        buttonSuccessPulse(stopBotBtn);
-        
-        updateStatus('idle');
-        monitorStatus.textContent = 'No';
-        if (botStartTime) {
-        	  const elapsedMs = new Date() - botStartTime;
-        	  const elapsedSeconds = Math.floor(elapsedMs / 1000);
-        	  const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
-        	  const minutes = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
-        	  const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
-        	  const elapsedTime = `${hours}:${minutes}:${seconds}`;
+    	  setButtonLoading(stopBotBtn, true, 'Stopping...');
 
-        	  document.getElementById('botStatusTime').textContent = elapsedTime;
-        }
+    	  const rawToken = localStorage.getItem('token');
+    	  if (!rawToken) {
+    	    showToast('⚠️ Missing authentication token. Please log in.', 'error');
+    	    settingsModal.classList.add('show');
+    	    settingsBackdrop.classList.add('show');
+    	    setButtonLoading(stopBotBtn, false);
+    	    return;
+    	  }
 
-        clearInterval(botTimerInterval);
-        botStartTime = null;
-        document.getElementById('botStatusLabel').textContent = 'Stopped';
+    	  const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
 
-        showToast('Bot stopped successfully', 'success');
-        console.log('Bot stopped');
-      });
+    	  try {
+    	    const res = await fetch('/api/bot/stop', {
+    	      method: 'POST',
+    	      headers: { 'Authorization': `Bearer ${token}` }
+    	    });
+
+    	    if (!res.ok) throw new Error("Failed to stop bot");
+    	    console.log("Bot stop API response:", await res.text());
+
+    	    await new Promise(resolve => setTimeout(resolve, 800));
+
+    	    setButtonLoading(stopBotBtn, false);
+    	    buttonSuccessPulse(stopBotBtn);
+
+    	    updateStatus('idle');
+    	    monitorStatus.textContent = 'No';
+
+    	    if (botStartTime) {
+    	      const elapsedMs = new Date() - botStartTime;
+    	      const elapsedSeconds = Math.floor(elapsedMs / 1000);
+    	      const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
+    	      const minutes = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+    	      const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+    	      const elapsedTime = `${hours}:${minutes}:${seconds}`;
+    	      document.getElementById('botStatusTime').textContent = elapsedTime;
+    	    }
+
+    	    clearInterval(botTimerInterval);
+    	    botStartTime = null;
+    	    document.getElementById('botStatusLabel').textContent = 'Stopped';
+
+    	    showToast('🛑 Bot stopped successfully', 'success');
+    	    console.log('Bot stopped');
+    	    
+    	  } catch (err) {
+    	    console.error("Error stopping bot:", err);
+    	    showToast('⚠️ Error stopping bot. Please try again.', 'error');
+    	    setButtonLoading(stopBotBtn, false);
+    	  }
+    	});
+
 
       function updateStatus(status) {
         if (status === 'active') {

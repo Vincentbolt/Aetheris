@@ -32,6 +32,7 @@ public class TradingBotController {
     
     @PostMapping("/stop")
     public ResponseEntity<String> stopBot() {
+    	System.out.println("Trade Bot Stopped");
         botService.stopBot();
         return ResponseEntity.ok("Bot stopped");
     }
