@@ -213,6 +213,7 @@ public class TradingAetherBotService {
 	
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
 		try {
+			System.out.println("Execute Strategy: " + "Running");
 			long now = System.currentTimeMillis();
 			JSONArray firstCandle = null;
 			JSONArray secondCandle = null;
