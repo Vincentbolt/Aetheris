@@ -1,10 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>Aetheris - Automated Options Trading</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheris - AI-Powered Automated Options Trading Platform</title>
+  <meta name="description" content="Earn consistent 1% daily returns with AI-powered options trading automation. Advanced strategies, mathematical analysis, and 24/7 market monitoring.">
+  <meta name="keywords" content="automated trading, options trading, AI trading, algorithmic trading, Angel One, demat account">
+  
+  <meta property="og:title" content="Aetheris - AI-Powered Automated Options Trading">
+  <meta property="og:description" content="Earn consistent returns with automated options trading powered by advanced AI algorithms">
+  <meta property="og:type" content="website">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     * {
       margin: 0;
@@ -12,11 +22,23 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --background: #0a0f1a;
+      --foreground: #f8fafc;
+      --card: #141824;
+      --primary: #00e0ff;
+      --accent: #0077ff;
+      --success: #00e07f;
+      --muted: #64748b;
+      --border: #1e293b;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
-      background: #0a0a0a;
-      color: #fff;
+      background: var(--background);
+      color: var(--foreground);
       overflow-x: hidden;
+      line-height: 1.6;
     }
 
     /* Animated Background */
@@ -27,7 +49,7 @@
       width: 100%;
       height: 100%;
       z-index: 0;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #16213e 100%);
     }
 
     .bg-animation::before,
@@ -35,14 +57,14 @@
       content: '';
       position: absolute;
       border-radius: 50%;
-      filter: blur(80px);
+      filter: blur(100px);
       animation: float 20s ease-in-out infinite;
     }
 
     .bg-animation::before {
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, rgba(0, 224, 255, 0.15), transparent);
+      background: radial-gradient(circle, rgba(0, 224, 255, 0.2), transparent);
       top: -200px;
       right: -200px;
     }
@@ -62,17 +84,15 @@
       66% { transform: translate(-50px, 50px) scale(0.9); }
     }
 
-    /* Navbar */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 1.5rem 5%;
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(0, 224, 255, 0.1);
-      z-index: 1000;
-      animation: slideDown 0.6s ease;
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes slideDown {
@@ -86,136 +106,96 @@
       }
     }
 
-    nav .container {
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 224, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(0, 224, 255, 0.6); }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes scaleIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-slide-down {
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .animate-glow-pulse {
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.6s ease-out;
+    }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 15, 26, 0.8);
+      border-bottom: 1px solid rgba(0, 224, 255, 0.1);
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .container {
       max-width: 1400px;
       margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 1rem 0;
     }
 
     .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
+      font-size: 1.875rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: 2px;
+      letter-spacing: 0.1em;
     }
 
-    .nav-btn {
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
-      border: none;
-      padding: 12px 30px;
-      border-radius: 12px;
-      color: #fff;
+    .btn {
+      padding: 0.75rem 2rem;
+      border-radius: 0.875rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
       text-decoration: none;
       display: inline-block;
-    }
-
-    .nav-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 224, 255, 0.4);
-    }
-
-    /* Hero Section */
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 100px 5% 50px;
-      z-index: 1;
-    }
-
-    .hero-content {
-      max-width: 1400px;
-      width: 100%;
-      text-align: center;
-      animation: fadeInUp 1s ease;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 224, 127, 0.1);
-      border: 1px solid rgba(0, 224, 127, 0.3);
-      padding: 8px 20px;
-      border-radius: 50px;
-      color: #00e07f;
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 2rem;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .hero h1 {
-      font-size: 4.5rem;
-      font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(90deg, #fff, #00e0ff, #0077ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: fadeInUp 1s ease 0.2s both;
-    }
-
-    .hero .subtitle {
-      font-size: 1.5rem;
-      color: #aaa;
-      margin-bottom: 1rem;
-      font-weight: 400;
-      animation: fadeInUp 1s ease 0.4s both;
-    }
-
-    .hero .highlight {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #00e0ff;
-      margin-bottom: 3rem;
-      animation: fadeInUp 1s ease 0.6s both;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: fadeInUp 1s ease 0.8s both;
+      border: none;
+      font-size: 1rem;
     }
 
     .btn-primary {
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
-      border: none;
-      padding: 18px 50px;
-      border-radius: 14px;
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: white;
       position: relative;
       overflow: hidden;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(0, 224, 255, 0.4);
     }
 
     .btn-primary::before {
@@ -233,88 +213,153 @@
       left: 100%;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 224, 255, 0.5);
-    }
-
-    .btn-secondary {
+    .btn-outline {
       background: rgba(255, 255, 255, 0.05);
       border: 2px solid rgba(0, 224, 255, 0.5);
-      padding: 16px 50px;
-      border-radius: 14px;
-      color: #00e0ff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
+      color: var(--primary);
     }
 
-    .btn-secondary:hover {
+    .btn-outline:hover {
       background: rgba(0, 224, 255, 0.1);
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 224, 255, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .btn-lg {
+      padding: 1.125rem 3rem;
+      font-size: 1.125rem;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: rgba(0, 224, 127, 0.1);
+      border: 1px solid rgba(0, 224, 127, 0.3);
+      color: var(--success);
+    }
+
+    .badge-primary {
+      background: rgba(0, 224, 255, 0.1);
+      border: 1px solid rgba(0, 224, 255, 0.3);
+      color: var(--primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 1.5rem 5rem;
+      z-index: 1;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 1200px;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin: 2rem 0;
+      background: linear-gradient(90deg, var(--foreground), var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero .subtitle {
+      font-size: 1.5rem;
+      color: var(--muted);
+      margin: 1.5rem auto;
+      max-width: 900px;
+    }
+
+    .hero .target {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 2rem 0;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    /* Card */
+    .card {
+      background: rgba(20, 24, 36, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 224, 255, 0.2);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      transition: all 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(0, 224, 255, 0.5);
+      box-shadow: 0 20px 60px rgba(0, 224, 255, 0.2);
     }
 
     /* Stats Section */
     .stats {
       position: relative;
-      padding: 80px 5%;
+      padding: 5rem 1.5rem;
       z-index: 1;
     }
 
-    .stats-container {
-      max-width: 1400px;
-      margin: 0 auto;
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .stat-card {
-      background: rgba(20, 20, 30, 0.7);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 224, 255, 0.2);
-      border-radius: 20px;
-      padding: 40px 30px;
       text-align: center;
-      transition: all 0.4s ease;
-      animation: fadeInUp 1s ease both;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.2s; }
-    .stat-card:nth-child(2) { animation-delay: 0.4s; }
-    .stat-card:nth-child(3) { animation-delay: 0.6s; }
-    .stat-card:nth-child(4) { animation-delay: 0.8s; }
-
-    .stat-card:hover {
-      transform: translateY(-10px);
-      border-color: #00e0ff;
-      box-shadow: 0 20px 50px rgba(0, 224, 255, 0.3);
+      padding: 2.5rem 1.5rem;
     }
 
     .stat-number {
       font-size: 3.5rem;
       font-weight: 900;
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 10px;
+      margin-bottom: 0.5rem;
     }
 
     .stat-label {
-      font-size: 1.1rem;
-      color: #aaa;
+      color: var(--muted);
       font-weight: 500;
     }
 
     /* Features Section */
     .features {
       position: relative;
-      padding: 100px 5%;
+      padding: 5rem 1.5rem;
       z-index: 1;
     }
 
@@ -323,7 +368,7 @@
       font-size: 3rem;
       font-weight: 800;
       margin-bottom: 1rem;
-      background: linear-gradient(90deg, #fff, #00e0ff);
+      background: linear-gradient(90deg, var(--foreground), var(--primary), var(--foreground));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -331,29 +376,22 @@
 
     .section-subtitle {
       text-align: center;
-      font-size: 1.2rem;
-      color: #888;
-      margin-bottom: 60px;
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 4rem;
     }
 
     .features-grid {
-      max-width: 1400px;
-      margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 40px;
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .feature-card {
-      background: rgba(20, 20, 30, 0.6);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      padding: 40px;
-      transition: all 0.4s ease;
       position: relative;
       overflow: hidden;
-      animation: fadeInUp 1s ease both;
     }
 
     .feature-card::before {
@@ -363,7 +401,7 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -372,256 +410,335 @@
       opacity: 1;
     }
 
-    .feature-card:hover {
-      transform: translateY(-10px);
-      border-color: rgba(0, 224, 255, 0.3);
-      box-shadow: 0 20px 60px rgba(0, 224, 255, 0.2);
-    }
-
     .feature-icon {
-      width: 70px;
-      height: 70px;
+      width: 4rem;
+      height: 4rem;
       background: linear-gradient(135deg, rgba(0, 224, 255, 0.2), rgba(0, 119, 255, 0.2));
-      border-radius: 16px;
+      border-radius: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 25px;
+      margin-bottom: 1.5rem;
       font-size: 2rem;
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
     }
 
     .feature-title {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #00e0ff;
-      margin-bottom: 15px;
+      color: var(--primary);
+      margin-bottom: 1rem;
     }
 
     .feature-desc {
-      font-size: 1rem;
-      color: #aaa;
+      color: var(--muted);
       line-height: 1.7;
+    }
+
+    /* Angel One Section */
+    .angel-section {
+      position: relative;
+      padding: 5rem 1.5rem;
+      z-index: 1;
+    }
+
+    .angel-card {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(20, 24, 36, 0.8), rgba(20, 24, 36, 0.6));
+      backdrop-filter: blur(30px);
+      border: 2px solid rgba(0, 224, 255, 0.3);
+      border-radius: 2rem;
+      padding: 4rem 3rem;
+      box-shadow: 0 0 60px rgba(0, 224, 255, 0.15);
+    }
+
+    .angel-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .angel-header h2 {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--foreground), var(--primary), var(--foreground));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 1rem 0;
+    }
+
+    .angel-header p {
+      font-size: 1.25rem;
+      color: var(--muted);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .angel-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .angel-features {
+      padding: 1rem 0;
+    }
+
+    .angel-features h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .check-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .angel-cta {
+      background: linear-gradient(135deg, rgba(0, 224, 255, 0.1), rgba(0, 119, 255, 0.1));
+      border: 1px solid rgba(0, 224, 255, 0.2);
+      border-radius: 1.5rem;
+      padding: 2rem;
+    }
+
+    .angel-cta h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .angel-cta p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .angel-cta .btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .angel-note {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-top: 1rem;
+    }
+
+    .security-note {
+      background: rgba(100, 116, 139, 0.1);
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .security-note p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     /* CTA Section */
     .cta-section {
       position: relative;
-      padding: 100px 5%;
-      text-align: center;
+      padding: 5rem 1.5rem;
       z-index: 1;
     }
 
     .cta-box {
       max-width: 900px;
       margin: 0 auto;
-      background: rgba(20, 20, 30, 0.8);
-      backdrop-filter: blur(30px);
-      border: 2px solid rgba(0, 224, 255, 0.3);
-      border-radius: 30px;
-      padding: 80px 50px;
-      animation: fadeInUp 1s ease;
+      text-align: center;
+      padding: 5rem 3rem;
     }
 
     .cta-box h2 {
       font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 20px;
-      background: linear-gradient(90deg, #fff, #00e0ff);
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--foreground), var(--primary), var(--foreground));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      margin-bottom: 1.5rem;
     }
 
     .cta-box p {
-      font-size: 1.3rem;
-      color: #aaa;
-      margin-bottom: 40px;
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* Footer */
     footer {
       position: relative;
-      padding: 40px 5%;
+      padding: 3rem 1.5rem;
       text-align: center;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(10, 10, 15, 0.8);
+      background: rgba(10, 15, 26, 0.8);
+      backdrop-filter: blur(20px);
       z-index: 1;
     }
 
     footer p {
-      color: #666;
+      color: var(--muted);
       font-size: 0.95rem;
     }
 
-    /* Responsive */
-    @media (max-width: 1200px) {
-      .hero h1 {
-        font-size: 3.5rem;
-      }
-
-      .hero .subtitle {
-        font-size: 1.3rem;
-      }
-
-      .hero .highlight {
-        font-size: 1.7rem;
-      }
+    /* Icons */
+    .icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      display: inline-block;
+      vertical-align: middle;
     }
 
+    /* Responsive */
     @media (max-width: 768px) {
-      nav {
-        padding: 1rem 4%;
-      }
-
-      .logo {
-        font-size: 1.5rem;
-      }
-
-      .nav-btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
-
-      .hero {
-        padding: 120px 4% 40px;
-      }
-
       .hero h1 {
         font-size: 2.5rem;
       }
 
       .hero .subtitle {
-        font-size: 1.1rem;
+        font-size: 1.125rem;
       }
 
-      .hero .highlight {
-        font-size: 1.4rem;
-      }
-
-      .btn-primary,
-      .btn-secondary {
-        padding: 14px 35px;
-        font-size: 1rem;
+      .hero .target {
+        font-size: 1.5rem;
       }
 
       .section-title {
-        font-size: 2.2rem;
-      }
-
-      .cta-box {
-        padding: 60px 30px;
-      }
-
-      .cta-box h2 {
-        font-size: 2.2rem;
-      }
-
-      .cta-box p {
-        font-size: 1.1rem;
-      }
-
-      .features-grid {
-        gap: 25px;
-      }
-
-      .stat-number {
-        font-size: 2.8rem;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .hero h1 {
         font-size: 2rem;
       }
 
-      .hero .subtitle {
-        font-size: 1rem;
+      .angel-header h2,
+      .cta-box h2 {
+        font-size: 2rem;
       }
 
-      .hero .highlight {
-        font-size: 1.2rem;
+      .angel-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .cta-box {
+        padding: 3rem 1.5rem;
       }
 
       .cta-buttons {
         flex-direction: column;
       }
 
-      .btn-primary,
-      .btn-secondary {
+      .btn-lg {
         width: 100%;
       }
-
-      .stats-container {
-        grid-template-columns: 1fr;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cta-box {
-        padding: 50px 25px;
-      }
-
-      .cta-box h2 {
-        font-size: 1.8rem;
-      }
     }
+
+    /* Delay animations */
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
   </style>
 </head>
 <body>
-
   <!-- Animated Background -->
   <div class="bg-animation"></div>
 
   <!-- Navbar -->
   <nav>
     <div class="container">
-      <div class="logo">AETHERIS</div>
-      <a href="/login.html" class="nav-btn">Login</a>
+      <div class="nav-content">
+        <div class="logo">AETHERIS</div>
+        <a href="/login.html" class="btn btn-primary">Login</a>
+      </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-    <div class="hero-badge">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+      <div class="badge badge-success animate-fade-in-up animate-glow-pulse">
+        <svg class="icon" fill="currentColor" viewBox="0 0 16 16">
           <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/>
         </svg>
         Automated Trading Platform
       </div>
-      <h1>
-        Earn <span class="hero-highlight"></span><br/>
+      
+      <h1 class="animate-fade-in-up delay-1">
+        Earn Consistently<br>
         With AI-Powered Trading
       </h1>
-      <p class="subtitle"> Advanced option trading automation with multiple strategies, mathematical analysis, 
-        spread checking, and risk-reward optimization. Let AI handle the complexity while you earn consistently.</p>
-      <p class="highlight">🎯 Target: Consistent 1% Daily Returns</p>
-      <div class="cta-buttons">
-        <a href="/register.html" class="btn-primary">Get Started Free</a>
-        <a href="#features" class="btn-secondary">Learn More</a>
+
+      <p class="subtitle animate-fade-in-up delay-2">
+        Advanced option trading AI with multiple strategies, mathematical analysis, 
+        spread checking, and risk-reward optimization. Let AI handle the complexity while you earn consistently.
+      </p>
+
+      <div class="target animate-fade-in-up delay-3">
+        <svg class="icon" style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke-width="2"/>
+          <circle cx="12" cy="12" r="6" stroke-width="2"/>
+          <circle cx="12" cy="12" r="2" stroke-width="2"/>
+        </svg>
+        Target: Consistent 1% Daily Returns
+      </div>
+
+      <div class="cta-buttons animate-fade-in-up delay-4">
+        <a href="/register.html" class="btn btn-primary btn-lg">Get Started Free</a>
+        <a href="#features" class="btn btn-outline btn-lg">Learn More</a>
       </div>
     </div>
   </section>
 
   <!-- Stats Section -->
   <section class="stats">
-    <div class="stats-container">
-      <div class="stat-card">
+    <div class="stats-grid">
+      <div class="card stat-card animate-fade-in-up delay-1">
         <div class="stat-number">1%</div>
         <div class="stat-label">Daily Target Returns</div>
       </div>
-      <div class="stat-card">
+      <div class="card stat-card animate-fade-in-up delay-2">
         <div class="stat-number">24/7</div>
         <div class="stat-label">Market Monitoring</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">5+</div>
-        <div class="stat-label">Trading Strategies</div>
-      </div>
-      <div class="stat-card">
+      <div class="card stat-card animate-fade-in-up delay-3">
+  		<div class="stat-number">8+</div>
+  		<div class="stat-label">Auto-Deployed Smart Modes</div>
+	  </div>
+      <div class="card stat-card animate-fade-in-up delay-4">
         <div class="stat-number">100%</div>
         <div class="stat-label">Automated Execution</div>
       </div>
@@ -630,40 +747,41 @@
 
   <!-- Features Section -->
   <section class="features" id="features">
-    <h2 class="section-title">Why Choose Aetheris?</h2>
-    <p class="section-subtitle">Powered by advanced algorithms and real-time market analysis</p>
+    <h2 class="section-title animate-fade-in-up">Why Choose Aetheris?</h2>
+    <p class="section-subtitle animate-fade-in-up delay-1">Powered by advanced algorithms and real-time market analysis</p>
+    
     <div class="features-grid">
-      <div class="feature-card">
+      <div class="card feature-card animate-fade-in-up delay-1">
         <div class="feature-icon">🤖</div>
         <h3 class="feature-title">Fully Automated Trading</h3>
         <p class="feature-desc">No manual intervention required. Our bot handles everything from market scanning to order execution with precision and speed.</p>
       </div>
 
-      <div class="feature-card">
+      <div class="card feature-card animate-fade-in-up delay-2">
         <div class="feature-icon">📊</div>
         <h3 class="feature-title">Mathematical Analysis</h3>
         <p class="feature-desc">Advanced algorithms analyze spread patterns, volatility, and market conditions to identify optimal entry and exit points.</p>
       </div>
 
-      <div class="feature-card">
+      <div class="card feature-card animate-fade-in-up delay-3">
         <div class="feature-icon">🎯</div>
-        <h3 class="feature-title">Multiple Strategies</h3>
-        <p class="feature-desc">Choose from various proven strategies including Iron Condor, Straddle, Strangle, and custom combinations for different market conditions.</p>
+        <h3 class="feature-title">Next-Gen Strategy Engine</h3>
+		<p class="feature-desc">Behind every click lies powerful AI that adapts to market shifts in milliseconds. Simplicity for you, intelligence underneath.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
+      <div class="card feature-card animate-fade-in-up delay-4">
+        <div class="feature-icon">🛡️</div>
         <h3 class="feature-title">Risk Management</h3>
         <p class="feature-desc">Built-in risk-reward analysis with automatic stop-loss and target-based exits to protect your capital and maximize gains.</p>
       </div>
 
-      <div class="feature-card">
+      <div class="card feature-card animate-fade-in-up delay-5">
         <div class="feature-icon">📈</div>
         <h3 class="feature-title">Spread Analysis</h3>
         <p class="feature-desc">Real-time spread checking ensures you get the best prices and optimal risk-reward ratios on every trade.</p>
       </div>
 
-      <div class="feature-card">
+      <div class="card feature-card animate-fade-in-up delay-6">
         <div class="feature-icon">🔒</div>
         <h3 class="feature-title">Secure & Reliable</h3>
         <p class="feature-desc">Bank-grade security with encrypted API connections. Your credentials and trades are always protected.</p>
@@ -671,18 +789,111 @@
     </div>
   </section>
 
+  <!-- Angel One Section -->
+  <section class="angel-section">
+    <div class="angel-card animate-fade-in-up">
+      <div class="angel-header">
+        <div class="badge badge-primary">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          Requirement
+        </div>
+        <h2>Angel One Demat Account Required</h2>
+        <p>To use Aetheris AI trading platform, you need an active Angel One demat account for seamless API integration and trade execution.</p>
+      </div>
+
+      <div class="angel-content">
+        <div class="angel-features">
+          <h3>Why Angel One?</h3>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>Fast order execution</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>Low brokerage charges</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>Advanced trading tools</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>Secure platform</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>24/7 support</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">
+              <svg style="width: 1rem; height: 1rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span>Easy account opening</span>
+          </div>
+        </div>
+
+        <div class="angel-cta">
+          <h3>Don't have an account?</h3>
+          <p>Open your Angel One demat account through our referral link and get started with automated trading in minutes.</p>
+          <a href="https://angel-one.onelink.me/Wjgr/referral" class="btn btn-primary btn-lg">
+            <span>Open Angel One Account</span>
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </a>
+          <p class="angel-note">Quick & paperless process • Ready in 24 hours</p>
+        </div>
+      </div>
+
+      <div class="security-note">
+        <p>
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          Your Angel One credentials are encrypted and stored securely. We only use them for authorized trading through official APIs.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
   <section class="cta-section">
-    <div class="cta-box">
-      <h2>Ready to Start Your Automated Trading?</h2>
-      <p>Join traders who are achieving consistent returns with Aetheris</p>
-      <a href="/register.html" class="btn-primary">Create Free Account</a>
+    <div class="card cta-box animate-scale-in">
+      <h2>Ready to Start Your AI Trading?</h2>
+      <p>Where smart decisions meet smarter technology – Welcome to Aetheris.</p>
+      <a href="/register.html" class="btn btn-primary btn-lg">Create Free Account</a>
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2025 Aetheris. All rights reserved. | Automated Options Trading Platform</p>
+    <div class="container">
+      <p>&copy; 2025 Aetheris. All rights reserved. | Automated Options Trading Platform</p>
+    </div>
   </footer>
 
   <script>
@@ -699,7 +910,26 @@
         }
       });
     });
-  </script>
 
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all animated elements
+    document.querySelectorAll('.animate-fade-in-up').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>
