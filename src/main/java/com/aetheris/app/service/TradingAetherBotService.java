@@ -157,20 +157,23 @@ public class TradingAetherBotService {
 	        public void run() {
 	            LocalTime now = LocalTime.now();
 	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
-	            System.out.println("Market is Open");
 	            // ✅ If before 9:46, wait until 9:46 to start
 	            if (!strategyStarted && now.isBefore(startTime)) {
+	            	System.out.println("Return in" + "!strategyStarted now.isBeforestartTime");
 	                return;
 	            }
 
 	            // ✅ Start exactly at 9:46 or the next 5-min multiple after current time
 	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
+	            	System.out.println("Entered in" + "!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
 	                LocalTime nextTriggerTime = getNextTriggerTime(now);
 	                if (now.equals(startTime)) {
+	                	System.out.println("Entered in" + "now.equals(startTime)");
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
 	                } else if (now.equals(nextTriggerTime)) {
+	                	System.out.println("Entered in" + "now.equals(nextTriggerTime)");
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
@@ -179,8 +182,10 @@ public class TradingAetherBotService {
 
 	            // ✅ Continue executing every 5 minutes while market is open
 	            if (strategyStarted && isMarketOpen()) {
+	            	System.out.println("Entered in" + "strategyStarted && isMarketOpen()");
 	                long currentTime = System.currentTimeMillis();
 	                if (currentTime - lastExecutionTime >= cooldownMillis) {
+	                	System.out.println("Entered in" + "currentTime - lastExecutionTime >= cooldownMillis");
 	                    executeStrategy(smartConnect, userId);
 	                    lastExecutionTime = currentTime;
 	                }
