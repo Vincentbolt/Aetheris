@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -158,58 +159,58 @@ public class TradingAetherBotService {
 	}
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
-		System.out.println("Starting Strategy");
-		LocalTime nextTriggerTime = getNextTriggerTime(LocalTime.now(IST));
-		// ✅ Guard against multiple starts
+	    System.out.println("Starting Strategy");
+
+	    ZoneId istZone = ZoneId.of("Asia/Kolkata");
+	    ZonedDateTime nextTriggerTime = getNextTriggerTime(ZonedDateTime.now(istZone));
+
+	    // ✅ Guard against multiple starts
 	    if (scheduler != null && !scheduler.isShutdown()) {
 	        System.out.println("⚠️ Bot is already running. Ignoring new start request.");
 	        return;
 	    }
 
-	    // ✅ Reset or clean up old scheduler if needed
+	    // ✅ Reset old scheduler if needed
 	    if (scheduler != null && scheduler.isShutdown()) {
 	        System.out.println("Cleaning up old scheduler...");
 	        scheduler = null;
 	    }
-	    
-		stopBot.set(false);
-		strategyStarted = false;
-		// ✅ 4️⃣ Create new scheduler and start repeating task
+
+	    stopBot.set(false);
+	    strategyStarted = false;
+
+	    // ✅ Create new scheduler
 	    scheduler = Executors.newSingleThreadScheduledExecutor();
 	    System.out.println("✅ Scheduler created.");
+
 	    scheduler.scheduleAtFixedRate(() -> {
 	        try {
-	        	if (stopBot.get()) {
+	            if (stopBot.get()) {
 	                System.out.println("🛑 Stop signal received. Cancelling strategy...");
 	                scheduler.shutdownNow();
 	                scheduler = null;
 	                return;
 	            }
-	            
-	        	LocalTime now = istTimeNow();
-	            LocalTime startTime = LocalTime.of(startHour, startMinutes);
-	            // ✅ If before 9:46, wait until 9:46 to start
+
+	            // ✅ Current IST time
+	            ZonedDateTime now = ZonedDateTime.now(istZone);
+	            ZonedDateTime startTime = now.withHour(startHour).withMinute(startMinutes).withSecond(0).withNano(0);
+
+	            // ✅ If strategy not started yet, wait until startTime
 	            if (!strategyStarted && now.isBefore(startTime)) {
-	            	System.out.println("Strategy not started yet. Now: " + now + ", StartTime: " + startTime);
+	                System.out.println("Strategy not started yet. Now: " + now.toLocalTime() + ", StartTime: " + startTime.toLocalTime());
 	                return;
 	            }
 
-	            // ✅ Start exactly at 9:46 or the next 5-min multiple after current time
+	            // ✅ Start exactly at startTime or nextTriggerTime
 	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
-	                if (now.equals(startTime)) {
-	                    executeStrategy(smartConnect, userId);
-	                    strategyStarted = true;
-	                    lastExecutionTime = System.currentTimeMillis();
-	                } else if (now.getHour() == nextTriggerTime.getHour()
-	                        && now.getMinute() == nextTriggerTime.getMinute()) {
+	                if (now.equals(startTime) || (now.getHour() == nextTriggerTime.getHour() && now.getMinute() == nextTriggerTime.getMinute())) {
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
 	                } else {
-	                	System.out.println("Strategy not started yet. Now: " + "Failed in now.equals(startTime) & now.equals(nextTriggerTime)" + now + startTime + nextTriggerTime + strategyStarted);
-		            }
-	            } else {
-	            	System.out.println("Strategy not started yet " + "Failed in !strategyStarted && (now.equals(startTime) || now.isAfter(startTime))");
+	                    System.out.println("Strategy not started yet. Now: " + now.toLocalTime() +", StartTime: " + startTime.toLocalTime() + ", NextTrigger: " + nextTriggerTime.toLocalTime());
+	                }
 	            }
 
 	            // ✅ Continue executing every 5 minutes while market is open
@@ -220,6 +221,7 @@ public class TradingAetherBotService {
 	                    lastExecutionTime = currentTime;
 	                }
 	            }
+
 	        } catch (Exception e) {
 	            if (e instanceof InterruptedException) {
 	                System.out.println("Strategy interrupted. Stopping...");
@@ -248,10 +250,13 @@ public class TradingAetherBotService {
 	 *  - 10:55 → 10:56
 	 *  - 11:03 → 11:06
 	 */
-	private LocalTime getNextTriggerTime(LocalTime now) {
+	private ZonedDateTime getNextTriggerTime(ZonedDateTime now) {
+	    int intervalMinutes = 5; // replace with your interval if different
 	    int currentMinute = now.getMinute();
-	    int baseMultiple = (currentMinute / intervalMinutes) * intervalMinutes;  // previous multiple
-	    int nextMultiple = baseMultiple + intervalMinutes;                       // next multiple
+
+	    // Calculate previous multiple and next multiple of the interval
+	    int baseMultiple = (currentMinute / intervalMinutes) * intervalMinutes;
+	    int nextMultiple = baseMultiple + intervalMinutes;
 
 	    int hour = now.getHour();
 	    if (nextMultiple >= 60) {
@@ -259,18 +264,20 @@ public class TradingAetherBotService {
 	        hour = (hour + 1) % 24;
 	    }
 
-	    LocalTime nextMultipleTime = LocalTime.of(hour, nextMultiple, 0);
+	    // Construct next multiple time in IST
+	    ZonedDateTime nextMultipleTime = now.withHour(hour).withMinute(nextMultiple).withSecond(0).withNano(0);
 
-	    // Add +1 minute offset for your trigger logic
-	    LocalTime triggerTime = nextMultipleTime.plusMinutes(1);
+	    // Add +1 minute offset for trigger logic
+	    ZonedDateTime triggerTime = nextMultipleTime.plusMinutes(1);
 
-	    // If the calculated trigger time is *not after now*, move to the next cycle
+	    // If trigger time is not after now, move to the next interval
 	    if (!triggerTime.isAfter(now)) {
 	        triggerTime = triggerTime.plusMinutes(intervalMinutes);
 	    }
 
 	    return triggerTime;
 	}
+
 	
 	/**
      * Stops the bot gracefully.
