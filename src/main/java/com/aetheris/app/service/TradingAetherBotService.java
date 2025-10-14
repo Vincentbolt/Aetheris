@@ -159,7 +159,7 @@ public class TradingAetherBotService {
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
-		LocalTime nextTriggerTime = getNextTriggerTime(LocalTime.now());
+		LocalTime nextTriggerTime = getNextTriggerTime(LocalTime.now(IST));
 		// ✅ Guard against multiple starts
 	    if (scheduler != null && !scheduler.isShutdown()) {
 	        System.out.println("⚠️ Bot is already running. Ignoring new start request.");
@@ -332,21 +332,23 @@ public class TradingAetherBotService {
 			// Extract last 6 candles
 			List<Double> closes = new ArrayList<>();
 
-			
-
 			double firstHigh = firstCandle.getDouble(2);
 			double firstLow = firstCandle.getDouble(3);
 			double secondHigh = secondCandle.getDouble(2);
 			double secondLow = secondCandle.getDouble(3);
-			double secondOpen = secondCandle.getDouble(1);
-			double secondClose = secondCandle.getDouble(4);
 
+			boolean sideways = botHelper.isSidewaysMarket(response1, 0.25);
+			if (sideways) {
+			    logger.info("Market is sideways. Skipping trade execution.");
+			    cooldownMillis = 300_000L;
+			    return;
+			}
 
 			String optionType = null;
 			if (!positionTaken.get()) {
-				if (secondHigh > firstHigh && secondLow > firstLow && secondClose > secondOpen) {
+				if (secondHigh > firstHigh && secondLow > firstLow) {
 					optionType = "CE";
-				} else if (secondLow < firstLow && secondHigh < firstHigh && secondClose < secondOpen) {
+				} else if (secondLow < firstLow && secondHigh < firstHigh) {
 					optionType = "PE";
 				}
 
@@ -415,6 +417,12 @@ public class TradingAetherBotService {
 						optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
 						optionSecondCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 1);
 						
+						boolean optionSideways = botHelper.isSidewaysMarket(optionData, 5);
+						if (optionSideways) {
+						    logger.info("Option Value is sideways. Skipping trade execution.");
+						    return;
+						}
+						
 						if (optionData != null && optionData.length() >= 2) {
 							// Extract last 6 candles
 							List<Double> closesofOption = new ArrayList<>();
@@ -423,8 +431,6 @@ public class TradingAetherBotService {
 							List<Double> optionVolumes = new ArrayList<>();
 
 							double vwapOptionNumerator = 0, vwapOptionDenominator = 0;
-
-							
 
 							double optionFirstHigh = optionFirstCandle.getDouble(2);
 							double optionFirstLow = optionFirstCandle.getDouble(3);

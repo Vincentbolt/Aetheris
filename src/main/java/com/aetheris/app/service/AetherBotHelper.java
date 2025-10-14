@@ -51,6 +51,42 @@ public class AetherBotHelper {
 		return closes;
 	}
 
+	public boolean isSidewaysMarket(JSONArray candles, double fromMarket) {
+	    try {
+	        if (candles == null || candles.length() < 5) return false;
+
+	        double highestHigh = Double.MIN_VALUE;
+	        double lowestLow = Double.MAX_VALUE;
+	        double sumClose = 0.0;
+
+	        // Loop through last 6 candles
+	        for (int i = candles.length() - 6; i < candles.length(); i++) {
+	            JSONArray candle = candles.getJSONArray(i);
+	            double high = candle.getDouble(2);
+	            double low = candle.getDouble(3);
+	            double close = candle.getDouble(4);
+
+	            highestHigh = Math.max(highestHigh, high);
+	            lowestLow = Math.min(lowestLow, low);
+	            sumClose += close;
+	        }
+
+	        double range = highestHigh - lowestLow;
+	        double avgClose = sumClose / 6.0;
+
+	        double compressionPercent = (range / avgClose) * 100.0;
+
+	        logger.info("Sideways Check → HighestHigh: {}, LowestLow: {}, Range: {}, AvgClose: {}, Compression: {}%",
+	                highestHigh, lowestLow, range, avgClose, compressionPercent);
+
+	        // If total move < 0.25% of price → sideways
+	        return compressionPercent < fromMarket;
+
+	    } catch (Exception e) {
+	        logger.error("Error in isSidewaysMarket(): ", e);
+	        return false;
+	    }
+	}
 	
 	
 	public int getRoundedValue(String indexType) {
