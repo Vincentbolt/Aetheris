@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +68,6 @@ public class TradingAetherBotService {
     private JSONArray cachedOptionData = null;
     private static final int startHour = 9;
     private static final int startMinutes = 46;
-    private static final int intervalMinutes = 5;
 	private boolean checkVolatalityCriteria = false;
 	private String indexType = null;
 	private String expiryDateWithMonthyear = null;
@@ -94,6 +94,9 @@ public class TradingAetherBotService {
     private TradeRepository tradeRepository;
 	
 	private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
+	
+	@Value("${app.back-test:false}") // default to false
+    private boolean backTestOnly;
 	
 	
 	public SmartConnect createSmartConnect(String totpKey, String apiKey, String clientId, String password) {
@@ -564,7 +567,7 @@ public class TradingAetherBotService {
 								}
 							}
 
-							if (strikeFound) {
+							if (strikeFound && !indexType.equalsIgnoreCase("SENSEX")) {
 								logger.info("Strike {} - IV: {}, Delta: {}, Gamma: {}, Theta: {}, Vega: {}", optionSTrikePrice, iv, delta, gamma, theta, vega);
 								if (checkVolatalityCriteria) {
 									if (!botHelper.isIVValid(iv)) {
@@ -610,39 +613,199 @@ public class TradingAetherBotService {
 							Long tradeId = this.saveTradeEntry(niftyString, capitalUsed, userId);
 							reached.set(true);
 							positionTaken.set(true);
+							
+							if (backTestOnly) {
+								while (reached.get()) {
+									JSONObject optionDataCheck = smartConnect.getLTP(exchangeOption, niftyString, optionToken);
+									if (optionDataCheck == null || optionDataCheck.length() == 0) {
+										logger.warn("Failed to fetch candle data. Retrying...");
+										try {
+											Thread.sleep(3000);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+										continue;
+									}
 
-							while (reached.get()) {
-								JSONObject optionDataCheck = smartConnect.getLTP(exchangeOption, niftyString, optionToken);
-								if (optionDataCheck == null || optionDataCheck.length() == 0) {
-									logger.warn("Failed to fetch candle data. Retrying...");
+									double marketPr = optionDataCheck.getDouble("ltp");
+									if (marketPr >= targetValue) {
+										capitalUsed = marketPr * quantity;
+										this.updateTradeExit(tradeId, capitalUsed, istNow());
+										positionTaken.set(false);
+										reached.set(false);
+										cooldownMillis = 300_000L;
+										break;
+									} else if (marketPr <= stoplossValue) {
+										capitalUsed = marketPr * quantity;
+										this.updateTradeExit(tradeId, capitalUsed, istNow());
+										positionTaken.set(false);
+										reached.set(false);
+										cooldownMillis = 300_000L;
+										break;
+									}
 									try {
-										Thread.sleep(3000);
+										Thread.sleep(1000);
 									} catch (InterruptedException e) {
 										e.printStackTrace();
 									}
-									continue;
+								}
+							} else {
+								String uniqueOrderid = null;
+								int maxRetries = 3;
+								int attempt = 0;
+
+								while (attempt < maxRetries) {
+								    try {
+								        JSONObject jsonObject = smartConnect.getOrderHistory(clientId);
+
+								        if (jsonObject != null && jsonObject.has("data")) {
+								            JSONArray dataArray = jsonObject.getJSONArray("data");
+
+								            for (int i = 0; i < dataArray.length(); i++) {
+								                JSONObject order = dataArray.getJSONObject(i);
+								                if (order.getString("orderid").equals(orderId)) {
+								                    uniqueOrderid = order.getString("uniqueorderid");
+								                    break;
+								                }
+								            }
+
+								            // Break retry loop if order found
+								            if (uniqueOrderid != null) {
+								                break;
+								            }
+								        } else {
+								            System.out.println("No data field in response or null response.");
+								        }
+
+								    } catch (Exception e) {
+								        System.out.println("Attempt " + (attempt + 1) + " failed: " + e.getMessage());
+								        // Optionally: e.printStackTrace();
+								    }
+
+								    attempt++;
+								    
+								    // Optional: wait before retrying (e.g., 1 second)
+								    try {
+								        Thread.sleep(1000); 
+								    } catch (InterruptedException ie) {
+								        Thread.currentThread().interrupt();
+								        break;
+								    }
 								}
 
-								double marketPr = optionDataCheck.getDouble("ltp");
-								if (marketPr >= targetValue) {
-									capitalUsed = marketPr * quantity;
-									this.updateTradeExit(tradeId, capitalUsed, istNow());
-									positionTaken.set(false);
-									reached.set(false);
-									cooldownMillis = 300_000L;
-									break;
-								} else if (marketPr <= stoplossValue) {
-									capitalUsed = marketPr * quantity;
-									this.updateTradeExit(tradeId, capitalUsed, istNow());
-									positionTaken.set(false);
-									reached.set(false);
-									cooldownMillis = 300_000L;
-									break;
-								}
-								try {
-									Thread.sleep(1000);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
+								if (uniqueOrderid != null) {
+									JSONObject individualOrderObject = null;
+									String orderStatus = null;
+
+									maxRetries = 3;
+									attempt = 0;
+
+									while (attempt < maxRetries) {
+									    try {
+									        individualOrderObject = smartConnect.getIndividualOrderDetails(uniqueOrderid);
+
+									        if (individualOrderObject != null && individualOrderObject.has("data")) {
+									            JSONObject individualOrderData = individualOrderObject.getJSONObject("data");
+									            orderStatus = individualOrderData.getString("orderstatus");
+									            break; // success, exit loop
+									        } else {
+									            System.out.println("Invalid or null response received on attempt " + (attempt + 1));
+									        }
+									    } catch (SmartAPIException e) {
+									        System.out.println("SmartAPIException on attempt " + (attempt + 1) + ": " + e.getMessage());
+									        // Optionally: e.printStackTrace();
+									    } catch (Exception e) {
+									        System.out.println("Unexpected error on attempt " + (attempt + 1) + ": " + e.getMessage());
+									    }
+
+									    attempt++;
+
+									    // Optional delay before retrying
+									    try {
+									        Thread.sleep(1000);
+									    } catch (InterruptedException ie) {
+									        Thread.currentThread().interrupt(); // restore interrupt status
+									        break;
+									    }
+									}
+
+									if (orderStatus != null && orderStatus.equalsIgnoreCase("pending")) {
+									    int maxPollingAttempts = 10; // Set a limit to avoid infinite loop
+									    int pollingAttempt = 0;
+
+									    while (orderStatus.equalsIgnoreCase("pending") && pollingAttempt < maxPollingAttempts) {
+									        try {
+									            // Wait between polling attempts (e.g., 2 seconds)
+									            Thread.sleep(2000);
+
+									            // Fetch updated order details
+									            individualOrderObject = smartConnect.getIndividualOrderDetails(uniqueOrderid);
+									            
+									            if (individualOrderObject != null && individualOrderObject.has("data")) {
+									                JSONObject individualOrderData = individualOrderObject.getJSONObject("data");
+									                orderStatus = individualOrderData.getString("orderstatus");
+
+									                if (orderStatus.equalsIgnoreCase("executed")) {
+									                    System.out.println("Order Executed.");
+									                    break;
+									                }
+									            } else {
+									                System.out.println("Invalid response received during polling.");
+									            }
+
+									        } catch (SmartAPIException e) {
+									            System.out.println("SmartAPIException during polling: " + e.getMessage());
+									        } catch (InterruptedException ie) {
+									            Thread.currentThread().interrupt();
+									            System.out.println("Polling interrupted.");
+									            break;
+									        } catch (Exception ex) {
+									            System.out.println("Unexpected exception during polling: " + ex.getMessage());
+									        }
+
+									        pollingAttempt++;
+									    }
+
+									    if (!orderStatus.equalsIgnoreCase("executed")) {
+									        System.out.println("Order did not execute within polling limit.");
+									    }
+									}
+
+
+									while (reached.get()) {
+										JSONObject optionDataCheck = smartConnect.getLTP(exchangeOption, niftyString, optionToken);
+										if (optionDataCheck == null || optionDataCheck.length() == 0) {
+											logger.warn("Failed to fetch candle data. Retrying...");
+											try {
+												Thread.sleep(3000);
+											} catch (InterruptedException e) {
+												e.printStackTrace();
+											}
+											continue;
+										}
+
+										double marketPr = optionDataCheck.getDouble("ltp");
+										if (marketPr >= targetValue) {
+											capitalUsed = marketPr * quantity;
+											this.updateTradeExit(tradeId, capitalUsed, istNow());
+											positionTaken.set(false);
+											reached.set(false);
+											cooldownMillis = 300_000L;
+											break;
+										} else if (marketPr <= stoplossValue) {
+											capitalUsed = marketPr * quantity;
+											this.updateTradeExit(tradeId, capitalUsed, istNow());
+											positionTaken.set(false);
+											reached.set(false);
+											cooldownMillis = 300_000L;
+											break;
+										}
+										try {
+											Thread.sleep(2000);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
 								}
 							}
 						}
