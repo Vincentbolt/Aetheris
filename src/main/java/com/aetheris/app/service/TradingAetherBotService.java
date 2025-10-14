@@ -159,7 +159,7 @@ public class TradingAetherBotService {
 	
 	public void startStrategy(SmartConnect smartConnect, User userId) {
 		System.out.println("Starting Strategy");
-		
+		LocalTime nextTriggerTime = getNextTriggerTime(LocalTime.now());
 		// ✅ Guard against multiple starts
 	    if (scheduler != null && !scheduler.isShutdown()) {
 	        System.out.println("⚠️ Bot is already running. Ignoring new start request.");
@@ -196,12 +196,12 @@ public class TradingAetherBotService {
 
 	            // ✅ Start exactly at 9:46 or the next 5-min multiple after current time
 	            if (!strategyStarted && (now.equals(startTime) || now.isAfter(startTime))) {
-	                LocalTime nextTriggerTime = getNextTriggerTime(now);
 	                if (now.equals(startTime)) {
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
-	                } else if (now.equals(nextTriggerTime)) {
+	                } else if (now.getHour() == nextTriggerTime.getHour()
+	                        && now.getMinute() == nextTriggerTime.getMinute()) {
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
@@ -241,18 +241,36 @@ public class TradingAetherBotService {
 	}
 
 	/**
-	 * ✅ Get next 5-minute interval after current time
-	 * Example: 10:03 → 10:06, 10:37 → 10:41, 11:04 → 11:06
+	 * Calculates the next trigger time:
+	 * → the next 5-min multiple after current time, then +1 minute.
+	 * Examples:
+	 *  - 10:49 → 10:51
+	 *  - 10:55 → 10:56
+	 *  - 11:03 → 11:06
 	 */
 	private LocalTime getNextTriggerTime(LocalTime now) {
-        int minute = now.getMinute();
-        int nextMultiple = ((minute / intervalMinutes) + 1) * intervalMinutes;
-        if (nextMultiple >= 60) {
-            return LocalTime.of(now.getHour() + 1, nextMultiple - 60, 0);
-        } else {
-            return LocalTime.of(now.getHour(), nextMultiple, 0);
-        }
-    }
+	    int currentMinute = now.getMinute();
+	    int baseMultiple = (currentMinute / intervalMinutes) * intervalMinutes;  // previous multiple
+	    int nextMultiple = baseMultiple + intervalMinutes;                       // next multiple
+
+	    int hour = now.getHour();
+	    if (nextMultiple >= 60) {
+	        nextMultiple -= 60;
+	        hour = (hour + 1) % 24;
+	    }
+
+	    LocalTime nextMultipleTime = LocalTime.of(hour, nextMultiple, 0);
+
+	    // Add +1 minute offset for your trigger logic
+	    LocalTime triggerTime = nextMultipleTime.plusMinutes(1);
+
+	    // If the calculated trigger time is *not after now*, move to the next cycle
+	    if (!triggerTime.isAfter(now)) {
+	        triggerTime = triggerTime.plusMinutes(intervalMinutes);
+	    }
+
+	    return triggerTime;
+	}
 	
 	/**
      * Stops the bot gracefully.
