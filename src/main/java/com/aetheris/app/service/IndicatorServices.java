@@ -193,8 +193,10 @@ public class IndicatorServices {
 
 
 	public String generateNiftyString(String indexType, String strikeOption, String expiryDateWithMonthyear) {
-		try {
-			String content = new String(Files.readAllBytes(Paths.get("C:\\Users\\vrkarputhara\\OpenAPIScripMaster.json")));
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream("OpenAPIScripMaster.json")) {
+			if (is == null) throw new FileNotFoundException("File not found in resources");
+
+			String content = new String(toByteArray(is), StandardCharsets.UTF_8);
 			JSONArray jsonArray = new JSONArray(content);
 			return getSymbolString(indexType, strikeOption, jsonArray, expiryDateWithMonthyear);
 		} catch (IOException e) {
