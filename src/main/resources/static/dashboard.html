@@ -1852,17 +1852,72 @@
         }
      });
 
-      logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('apiCredentials');
+      logoutBtn.addEventListener('click', async () => {
+    	    // First, check if the bot is running (optional, based on your app state)
+    	    if (typeof stopBotBtn !== 'undefined' && !stopBotBtn.disabled) {
+    	        // Trigger stopBot logic manually instead of clicking the button
+    	        try {
+    	            setButtonLoading(stopBotBtn, true, 'Stopping...');
 
-      const msgDiv = document.createElement('div');
-      msgDiv.textContent = 'Logged out successfully';
-      msgDiv.className = 'logout-msg';
-      document.body.appendChild(msgDiv);
+    	            const rawToken = localStorage.getItem('token');
+    	            if (!rawToken) throw new Error('Missing token');
 
-      setTimeout(() => msgDiv.remove(), 2000);
-      setTimeout(() => window.location.href = '/login.html', 500);
-      });
+    	            const token = rawToken.startsWith('Bearer ') ? rawToken.substring(7) : rawToken;
+
+    	            const res = await fetch('/api/bot/stop', {
+    	                method: 'POST',
+    	                headers: { 'Authorization': `Bearer ${token}` }
+    	            });
+
+    	            if (!res.ok) throw new Error("Failed to stop bot");
+    	            console.log("Bot stop API response:", await res.text());
+
+    	            // Wait a short moment
+    	            await new Promise(resolve => setTimeout(resolve, 800));
+
+    	            updateStatus('idle');
+    	            monitorStatus.textContent = 'No';
+
+    	            if (botStartTime) {
+    	                const elapsedMs = new Date() - botStartTime;
+    	                const elapsedSeconds = Math.floor(elapsedMs / 1000);
+    	                const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
+    	                const minutes = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+    	                const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+    	                const elapsedTime = `${hours}:${minutes}:${seconds}`;
+    	                document.getElementById('botStatusTime').textContent = elapsedTime;
+    	            }
+
+    	            clearInterval(botTimerInterval);
+    	            botStartTime = null;
+    	            document.getElementById('botStatusLabel').textContent = 'Stopped';
+
+    	            startBotBtn.disabled = false;
+    	            startBotBtn.textContent = 'Start';
+    	            startBotBtn.classList.remove('btn-loading');
+    	            buttonSuccessPulse(startBotBtn);
+
+    	            showToast('🛑 Bot stopped before logout', 'success');
+    	        } catch (err) {
+    	            console.error("Error stopping bot during logout:", err);
+    	            showToast('⚠️ Failed to stop bot before logout.', 'error');
+    	        } finally {
+    	            setButtonLoading(stopBotBtn, false);
+    	        }
+    	    }
+
+    	    // Now proceed with logout
+    	    sessionStorage.removeItem('apiCredentials');
+
+    	    const msgDiv = document.createElement('div');
+    	    msgDiv.textContent = 'Logged out successfully';
+    	    msgDiv.className = 'logout-msg';
+    	    document.body.appendChild(msgDiv);
+
+    	    setTimeout(() => msgDiv.remove(), 2000);
+    	    setTimeout(() => window.location.href = '/login.html', 500);
+    	});
+
 
       startBotBtn.addEventListener('click', async () => {
     	    const rawToken = localStorage.getItem('token');
