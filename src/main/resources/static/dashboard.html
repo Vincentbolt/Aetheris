@@ -1313,7 +1313,7 @@
 					</div>
 					<div class="form-group">
 						<label>Target %</label> <input type="number" id="targetPercent"
-							class="form-control" value="2" />
+							class="form-control" value="2" min="1" max="2" />
 					</div>
 					<div class="form-group">
 						<label>Stoploss %</label> <input type="number"
@@ -1712,6 +1712,7 @@
     	        document.getElementById('capitalAmount').value = config.capitalAmount || 500000;
     	        targetPercent.value = config.targetPercent || 2;
     	        stoplossPercent.value = config.stoplossPercent || 1;
+    	        stoplossPercent.disabled = true;
 
     	        toggleFields(); // adjust target/stoploss based on variety
     	        console.log('Bot config loaded:', config);
