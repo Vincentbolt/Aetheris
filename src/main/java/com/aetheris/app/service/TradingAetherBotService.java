@@ -201,7 +201,6 @@ public class TradingAetherBotService {
 
 	            // ✅ If strategy not started yet, wait until startTime
 	            if (!strategyStarted && now.isBefore(startTime)) {
-	                System.out.println("Strategy not started yet. Now: " + now.toLocalTime() + ", StartTime: " + startTime.toLocalTime());
 	                return;
 	            }
 
@@ -211,8 +210,6 @@ public class TradingAetherBotService {
 	                    executeStrategy(smartConnect, userId);
 	                    strategyStarted = true;
 	                    lastExecutionTime = System.currentTimeMillis();
-	                } else {
-	                    System.out.println("Strategy not started yet. Now: " + now.toLocalTime() +", StartTime: " + startTime.toLocalTime() + ", NextTrigger: " + nextTriggerTime.toLocalTime());
 	                }
 	            }
 
@@ -321,9 +318,7 @@ public class TradingAetherBotService {
 				}
 				lastNiftyTradeFetchTime = nowIstMillis;
 				firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
-				System.out.println("firstCandle : {}" + firstCandle);
 				secondCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 1);
-				System.out.println("secondCandle : {}" + secondCandle);
 			}
 			JSONArray response1 = cachedNiftyTradeValue;
 			firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
@@ -355,13 +350,21 @@ public class TradingAetherBotService {
 			}
 
 			String optionType = null;
+			double avg = 0.0;
+			double diff = 0.0;
 			if (!positionTaken.get()) {
 				if (secondHigh > firstHigh && secondLow > firstLow) {
 					optionType = "CE";
+					diff = secondHigh - firstLow;
+					avg  = diff / 2;
 				} else if (secondLow < firstLow && secondHigh < firstHigh) {
 					optionType = "PE";
+					diff = firstHigh - secondLow;
+					avg  = diff / 2;
 				}
-
+				
+				targetPercent = calculateTargetPercent(indexType, avg);
+				
 				if(optionType == null) {
 					System.out.println("Index Basic Trend pattern not formed.");
 					cooldownMillis = 300_000L;
@@ -394,10 +397,21 @@ public class TradingAetherBotService {
 					System.out.println("secondCandle : " + secondCandle);
 					
 					double rsi = indServices.calculateRSI(closes, 5);
-					if ((optionType.equals("CE") && rsi > 70 && !(rsi >= 80)) ||(optionType.equals("PE") && rsi < 30)) {
-						System.out.println("RSI filter failed: " + rsi);
-						cooldownMillis = 1_000L;
-						return;
+
+					if (optionType.equals("CE")) {
+					    // allow wider RSI in trending bullish markets
+					    if (rsi < 45 || rsi > 95) {
+					        logger.info("CE RSI filter failed: {}", rsi);
+					        cooldownMillis = 1_000L;
+					        return;
+					    }
+					} else if (optionType.equals("PE")) {
+					    // allow wider RSI in trending bearish markets
+					    if (rsi > 55 || rsi < 3) {
+					        logger.info("PE RSI filter failed: {}", rsi);
+					        cooldownMillis = 1_000L;
+					        return;
+					    }
 					}
 
 					// 🧠 Continue with your existing code to generate symbol,
@@ -411,7 +425,6 @@ public class TradingAetherBotService {
 					niftyString = indServices.generateNiftyString(indexType, strikeOption, expiryDateWithMonthyear);
 					optionToken = indServices.getToken(niftyString);
 					if (optionToken != null && !stopBot.get()) {
-						 targetPercent = 2.0;
 						// 👇 Throttle fetchNiftyValue(optionToken) to once every 5 minutes
 						 JSONArray optionFirstCandle = null;
 						 JSONArray optionSecondCandle = null;
@@ -419,9 +432,7 @@ public class TradingAetherBotService {
 						    cachedOptionData = fetchNiftyValue(optionToken, smartConnect);
 						    lastOptionDataFetchTime = nowIstMillis;
 						    optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
-							System.out.println("optionFirstCandle : " + optionFirstCandle);
 							optionSecondCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 1);
-							System.out.println("optionSecondCandle : " + optionSecondCandle);
 						}
 						JSONArray optionData = cachedOptionData;
 						optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
@@ -472,11 +483,6 @@ public class TradingAetherBotService {
 							}
 
 							double vwapOption = vwapOptionNumerator / vwapOptionDenominator;
-							
-							optionFirstCandle = optionCurrentData.getJSONArray(optionCurrentData.length() - 2);
-							System.out.println("optionFirstCandle : " + optionFirstCandle);
-							optionSecondCandle = optionCurrentData.getJSONArray(optionCurrentData.length() - 1);
-							System.out.println("optionSecondCandle : " + optionSecondCandle);
 								
 							if (optionSecondHigh > optionFirstHigh && optionSecondLow > optionFirstLow && optionSecondHigh != optionSecondClose) {
 								if (optionSecondClose <= vwapOption) {
@@ -493,19 +499,10 @@ public class TradingAetherBotService {
 							// ✅ Option RSI Filter
 							double rsiOption = indServices.calculateRSI(closesofOption, 5);
 
-							if (!botHelper.isOptionRSIFilterPassed(rsiOption)) {
+							if (!botHelper.isOptionRSIFilterPassed(rsiOption, rsi)) {
 								cooldownMillis = 1_000L;
 								return;
 							}
-
-							double atrValue = indServices.calculateATR(optionData, 6);
-							System.out.println("ATR: {}" + atrValue);
-
-							List<Double> sarValues = indServices.calculateParabolicSAR(optionHighs, optionLows, true);
-							double latestSar = sarValues.get(sarValues.size() - 1);
-							double latestClose = optionData.getJSONArray(optionData.length() - 1).getDouble(4);
-							System.out.println("latestSar: {}, latestSar: {}" + latestSar + latestClose);
-
 
 							JSONObject ltpOptionData = smartConnect.getLTP(exchangeOption, niftyString, optionToken);
 							double atTheTimeOption = ltpOptionData.getDouble("ltp");
@@ -971,6 +968,25 @@ public class TradingAetherBotService {
 
     public static LocalDate istDateNow() {
         return LocalDate.now(IST);
+    }
+    
+    private double calculateTargetPercent(String indexType, double avg) {
+        if (indexType == null) {
+            return 1; // Default safe value
+        }
+
+        switch (indexType.toUpperCase()) {
+            case "NIFTY":
+            case "FINNIFTY":
+                return (avg >= 15.0) ? 2.0 : 1.0;
+
+            case "BANKNIFTY":
+            case "SENSEX":
+                return (avg >= 30.0) ? 2.0 : 1.0;
+
+            default:
+                return (avg >= 10.0) ? 2.0 : 1.0;
+        }
     }
     
 }

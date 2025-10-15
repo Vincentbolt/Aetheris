@@ -177,11 +177,17 @@ public class AetherBotHelper {
 	}
 
 	
-	public boolean isOptionRSIFilterPassed(double rsiOption) {
-	    if ((rsiOption < 50 || rsiOption > 75) && rsiOption <= 80) {
-	        logger.info("Option RSI filter failed: {}", rsiOption);
+	public boolean isOptionRSIFilterPassed(double optionRsi, double indexRsi) {
+	    boolean isTrending = (indexRsi >= 70 || indexRsi <= 30);
+	    double upperLimit = isTrending ? 85 : 75;
+	    double lowerLimit = 45;
+
+	    if (optionRsi < lowerLimit || optionRsi > upperLimit) {
+	        logger.info("❌ Option RSI filter failed (indexRsi={}): {}", indexRsi, optionRsi);
 	        return false;
 	    }
+
+	    logger.info("✅ Option RSI filter passed (indexRsi={}): {}", indexRsi, optionRsi);
 	    return true;
 	}
 
