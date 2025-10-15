@@ -364,7 +364,7 @@ public class TradingAetherBotService {
 
 				if(optionType == null) {
 					System.out.println("Index Basic Trend pattern not formed.");
-					cooldownMillis = 1_000L;
+					cooldownMillis = 300_000L;
 					return;
 				}
 
