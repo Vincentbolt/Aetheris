@@ -347,7 +347,7 @@ public class TradingAetherBotService {
 			double secondHigh = secondCandle.getDouble(2);
 			double secondLow = secondCandle.getDouble(3);
 
-			boolean sideways = botHelper.isSidewaysMarket(response1, 0.25);
+			boolean sideways = botHelper.isSidewaysMarket(response1, indexType);
 			if (sideways) {
 			    System.out.println("Market is sideways. Skipping trade execution.");
 			    cooldownMillis = 300_000L;
@@ -426,12 +426,6 @@ public class TradingAetherBotService {
 						JSONArray optionData = cachedOptionData;
 						optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
 						optionSecondCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 1);
-						
-						boolean optionSideways = botHelper.isSidewaysMarket(optionData, 5);
-						if (optionSideways) {
-						    System.out.println("Option Value is sideways. Skipping trade execution.");
-						    return;
-						}
 						
 						if (optionData != null && optionData.length() >= 2) {
 							// Extract last 6 candles
