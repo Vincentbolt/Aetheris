@@ -857,6 +857,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const tokenData = { token: result.token, timestamp: Date.now() };
         const tokenStr = JSON.stringify(tokenData);
         document.cookie = `auth_token=${tokenStr}; path=/; max-age=86400`;
+        
+     // Also store in localStorage
+        localStorage.setItem('token', result.token);
 
         msgDiv.className = 'success';
         msgDiv.textContent = '✅ Login successful! Redirecting...';
