@@ -312,18 +312,18 @@ public class TradingAetherBotService {
 				cachedNiftyTradeValue = fetchNiftyTradeValue(smartConnect);
 				if (cachedNiftyTradeValue == null || cachedNiftyTradeValue.length() < 7) {
 					if (cachedNiftyTradeValue != null) {
-						logger.info("Not enough candles. Candles Formed: {}", cachedNiftyTradeValue.length());
+						System.out.println("Not enough candles. Candles Formed: {}" + cachedNiftyTradeValue.length());
 					} else {
-						logger.info("Not enough candles.");
+						System.out.println("Not enough candles.");
 					}
 					cooldownMillis = 1_000L;
 					return; 
 				}
 				lastNiftyTradeFetchTime = nowIstMillis;
 				firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
-				logger.info("firstCandle : {}",firstCandle);
+				System.out.println("firstCandle : {}" + firstCandle);
 				secondCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 1);
-				logger.info("secondCandle : {}",secondCandle);
+				System.out.println("secondCandle : {}" + secondCandle);
 			}
 			JSONArray response1 = cachedNiftyTradeValue;
 			firstCandle = cachedNiftyTradeValue.getJSONArray(cachedNiftyTradeValue.length() - 2);
@@ -332,9 +332,9 @@ public class TradingAetherBotService {
 
 			if (response1 == null || response1.length() < 7) {
 				if (response1 != null) {
-					logger.info("Not enough candles. Candles Formed: {}", response1.length());
+					System.out.println("Not enough candles. Candles Formed: " + response1.length());
 				} else {
-					logger.info("Not enough candles.");
+					System.out.println("Not enough candles.");
 				}
 				cooldownMillis = 1_000L;
 				return; 
@@ -349,7 +349,7 @@ public class TradingAetherBotService {
 
 			boolean sideways = botHelper.isSidewaysMarket(response1, 0.25);
 			if (sideways) {
-			    logger.info("Market is sideways. Skipping trade execution.");
+			    System.out.println("Market is sideways. Skipping trade execution.");
 			    cooldownMillis = 300_000L;
 			    return;
 			}
@@ -374,9 +374,9 @@ public class TradingAetherBotService {
 					
 					if (currentResponse == null || currentResponse.length() < 7) {
 						if (currentResponse != null) {
-							logger.info("Not enough candles. Candles Formed: {}", currentResponse.length());
+							System.out.println("Not enough candles. Candles Formed: {}" +  currentResponse.length());
 						} else {
-							logger.info("Not enough candles.");
+							System.out.println("Not enough candles.");
 						}
 						cooldownMillis = 1_000L;
 						return; 
@@ -389,13 +389,13 @@ public class TradingAetherBotService {
 					}
 					
 					firstCandle = currentResponse.getJSONArray(currentResponse.length() - 2);
-					logger.info("firstCandle : {}",firstCandle);
+					System.out.println("firstCandle : " + firstCandle);
 					secondCandle = currentResponse.getJSONArray(currentResponse.length() - 1);
-					logger.info("secondCandle : {}",secondCandle);
+					System.out.println("secondCandle : " + secondCandle);
 					
 					double rsi = indServices.calculateRSI(closes, 5);
 					if ((optionType.equals("CE") && rsi > 70 && !(rsi >= 80)) ||(optionType.equals("PE") && rsi < 30)) {
-						logger.info("RSI filter failed: " + rsi);
+						System.out.println("RSI filter failed: " + rsi);
 						cooldownMillis = 1_000L;
 						return;
 					}
@@ -419,9 +419,9 @@ public class TradingAetherBotService {
 						    cachedOptionData = fetchNiftyValue(optionToken, smartConnect);
 						    lastOptionDataFetchTime = nowIstMillis;
 						    optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
-							logger.info("optionFirstCandle : {}",optionFirstCandle);
+							System.out.println("optionFirstCandle : " + optionFirstCandle);
 							optionSecondCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 1);
-							logger.info("optionSecondCandle : {}",optionSecondCandle);
+							System.out.println("optionSecondCandle : " + optionSecondCandle);
 						}
 						JSONArray optionData = cachedOptionData;
 						optionFirstCandle = cachedOptionData.getJSONArray(cachedOptionData.length() - 2);
@@ -429,7 +429,7 @@ public class TradingAetherBotService {
 						
 						boolean optionSideways = botHelper.isSidewaysMarket(optionData, 5);
 						if (optionSideways) {
-						    logger.info("Option Value is sideways. Skipping trade execution.");
+						    System.out.println("Option Value is sideways. Skipping trade execution.");
 						    return;
 						}
 						
@@ -452,9 +452,9 @@ public class TradingAetherBotService {
 							
 							if (optionCurrentData == null || optionCurrentData.length() < 7) {
 								if (optionCurrentData != null) {
-									logger.info("Not enough candles. Candles Formed: {}", optionCurrentData.length());
+									System.out.println("Not enough candles. Candles Formed: " + optionCurrentData.length());
 								} else {
-									logger.info("Not enough candles.");
+									System.out.println("Not enough candles.");
 								}
 								cooldownMillis = 1_000L;
 								return; 
@@ -480,18 +480,18 @@ public class TradingAetherBotService {
 							double vwapOption = vwapOptionNumerator / vwapOptionDenominator;
 							
 							optionFirstCandle = optionCurrentData.getJSONArray(optionCurrentData.length() - 2);
-							logger.info("optionFirstCandle : {}",optionFirstCandle);
+							System.out.println("optionFirstCandle : " + optionFirstCandle);
 							optionSecondCandle = optionCurrentData.getJSONArray(optionCurrentData.length() - 1);
-							logger.info("optionSecondCandle : {}",optionSecondCandle);
+							System.out.println("optionSecondCandle : " + optionSecondCandle);
 								
 							if (optionSecondHigh > optionFirstHigh && optionSecondLow > optionFirstLow && optionSecondHigh != optionSecondClose) {
 								if (optionSecondClose <= vwapOption) {
-									logger.info("VWAP option Filter Failed: {}, optionSecondClose: {}", vwapOption, optionSecondClose);
+									System.out.println("VWAP option Filter Failed: {}, optionSecondClose: " + vwapOption + optionSecondClose);
 									cooldownMillis = 1_000L;
 									return;
 								}
 							} else {
-								logger.info("Option Basic Trend pattern not formed.");
+								System.out.println("Option Basic Trend pattern not formed.");
 								cooldownMillis = 1_000L;
 								return;
 							}
@@ -505,12 +505,12 @@ public class TradingAetherBotService {
 							}
 
 							double atrValue = indServices.calculateATR(optionData, 6);
-							logger.info("ATR: {}", atrValue);
+							System.out.println("ATR: {}" + atrValue);
 
 							List<Double> sarValues = indServices.calculateParabolicSAR(optionHighs, optionLows, true);
 							double latestSar = sarValues.get(sarValues.size() - 1);
 							double latestClose = optionData.getJSONArray(optionData.length() - 1).getDouble(4);
-							logger.info("latestSar: {}, latestSar: {}", latestSar, latestClose);
+							System.out.println("latestSar: {}, latestSar: {}" + latestSar + latestClose);
 
 
 							JSONObject ltpOptionData = smartConnect.getLTP(exchangeOption, niftyString, optionToken);
@@ -536,7 +536,7 @@ public class TradingAetherBotService {
 								JSONObject optionResponse = null;
 								try {
 									optionResponse = smartConnect.optionGreek(payload);
-									logger.info("optionGreek: {}", optionResponse);
+									System.out.println("optionGreek: {}" + optionResponse);
 								} catch (IOException | SmartAPIException e) {
 									e.printStackTrace();
 								}
@@ -568,7 +568,7 @@ public class TradingAetherBotService {
 							}
 
 							if (strikeFound && !indexType.equalsIgnoreCase("SENSEX")) {
-								logger.info("Strike {} - IV: {}, Delta: {}, Gamma: {}, Theta: {}, Vega: {}", optionSTrikePrice, iv, delta, gamma, theta, vega);
+								System.out.println("Strike {} - IV: {}, Delta: {}, Gamma: {}, Theta: {}, Vega: {}" + optionSTrikePrice + iv + delta + gamma + theta + vega);
 								if (checkVolatalityCriteria) {
 									if (!botHelper.isIVValid(iv)) {
 										cooldownMillis = 1_000L;
