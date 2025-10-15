@@ -2249,7 +2249,7 @@
           const user = await userRes.json();
 
           // Show loading state
-          setButtonLoading(startBotBtn, true, 'Starting...');
+          setButtonLoading(startBotBtn, true, 'Started');
 
           const startRes = await fetch(`/api/bot/start?userId=${user.id}`, {
             method: 'POST',
