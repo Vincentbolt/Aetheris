@@ -50,35 +50,6 @@ public class AetherBotHelper {
 		}
 		return closes;
 	}
-
-	public boolean isSidewaysMarket(JSONArray candles, String indexType) {
-	    try {
-	        if (candles == null || candles.length() < 5) return false;
-
-	        double sumRange = 0.0;
-	        for (int i = candles.length() - 6; i < candles.length(); i++) {
-	            JSONArray candle = candles.getJSONArray(i);
-	            double high = candle.getDouble(2);
-	            double low = candle.getDouble(3);
-	            sumRange += (high - low);
-	        }
-	        double avgRange = sumRange / 6.0;
-
-	        logger.info("Average True range : {}",avgRange);
-
-	        if (indexType.equalsIgnoreCase("NIFTY") || indexType.equalsIgnoreCase("FINNIFTY")) {
-	        	return avgRange < 15;
-	        } else if (indexType.equalsIgnoreCase("BANKNIFTY") || indexType.equalsIgnoreCase("SENSEX")) {
-	        	return avgRange < 30;
-	        } else {
-	        	return avgRange < 10;
-	        }
-	    } catch (Exception e) {
-	        logger.error("Error in isSidewaysMarket(): ", e);
-	        return false;
-	    }
-	}
-	
 	
 	public int getRoundedValue(String indexType) {
 		int roundTo = 0;
