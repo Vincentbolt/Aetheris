@@ -14,10 +14,26 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --background: #0a0a0f;
+      --card-bg: rgba(15, 20, 32, 0.8);
+      --primary: #00d4ff;
+      --accent: #0066ff;
+      --purple: #7b2ff7;
+      --success: #00d07a;
+      --error: #ff5252;
+      --text-primary: #f8fafc;
+      --text-secondary: #64748b;
+      --glow-primary: rgba(0, 212, 255, 0.15);
+      --glow-accent: rgba(0, 102, 255, 0.15);
+      --glow-purple: rgba(123, 47, 247, 0.15);
+      --border-color: rgba(255, 255, 255, 0.08);
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       min-height: 100vh;
-      background: #000;
+      background: var(--background);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -26,14 +42,14 @@
       overflow: hidden;
     }
 
-    /* Animated gradient background */
+    /* Enhanced animated gradient background */
     body::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f1420 25%, #131825 50%, #1a1f35 75%, #0f1420 100%);
       background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
+      animation: gradientShift 20s ease infinite;
     }
 
     @keyframes gradientShift {
@@ -41,37 +57,37 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* Floating orbs */
+    /* Enhanced floating orbs with better glow */
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(60px);
+      filter: blur(80px);
       opacity: 0;
-      animation: orbFloat 20s ease-in-out infinite;
+      animation: orbFloat 25s ease-in-out infinite;
     }
 
     .orb:nth-child(1) {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(0, 224, 255, 0.3), transparent);
-      top: -250px;
-      right: -250px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.25), transparent);
+      top: -300px;
+      right: -300px;
       animation-delay: 0s;
     }
 
     .orb:nth-child(2) {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(138, 43, 226, 0.25), transparent);
-      bottom: -200px;
-      left: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(123, 47, 247, 0.2), transparent);
+      bottom: -250px;
+      left: -250px;
       animation-delay: 5s;
     }
 
     .orb:nth-child(3) {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, rgba(0, 119, 255, 0.2), transparent);
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 102, 255, 0.15), transparent);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -81,27 +97,27 @@
     @keyframes orbFloat {
       0%, 100% { 
         transform: translate(0, 0) scale(1);
-        opacity: 0.4;
+        opacity: 0.2;
       }
       33% { 
         transform: translate(30px, -30px) scale(1.1);
-        opacity: 0.6;
+        opacity: 0.3;
       }
       66% { 
         transform: translate(-30px, 30px) scale(0.9);
-        opacity: 0.5;
+        opacity: 0.25;
       }
     }
 
-    /* Particle grid */
+    /* Enhanced particle grid */
     .grid-overlay {
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(0, 224, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 224, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
       background-size: 50px 50px;
-      animation: gridMove 20s linear infinite;
+      animation: gridMove 25s linear infinite;
       pointer-events: none;
     }
 
@@ -119,15 +135,15 @@
     }
 
     .register-card {
-      background: rgba(15, 15, 25, 0.7);
-      backdrop-filter: blur(40px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--card-bg);
+      backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--border-color);
       border-radius: 28px;
       padding: 50px 40px;
       box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 20px 60px rgba(0, 224, 255, 0.1);
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 20px 60px var(--glow-primary);
       animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
       transform-style: preserve-3d;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -135,7 +151,7 @@
       overflow: hidden;
     }
 
-    /* Holographic shine effect */
+    /* Enhanced holographic shine effect */
     .register-card::before {
       content: '';
       position: absolute;
@@ -146,11 +162,11 @@
       background: linear-gradient(
         45deg,
         transparent 30%,
-        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.03) 50%,
         transparent 70%
       );
       transform: rotate(45deg);
-      animation: holoShine 8s ease-in-out infinite;
+      animation: holoShine 10s ease-in-out infinite;
     }
 
     @keyframes holoShine {
@@ -161,9 +177,9 @@
     .register-card:hover {
       transform: translateY(-5px) rotateX(2deg);
       box-shadow: 
-        0 12px 48px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-        0 25px 80px rgba(0, 224, 255, 0.2);
+        0 12px 48px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 25px 80px var(--glow-primary);
     }
 
     @keyframes cardEntrance {
@@ -178,18 +194,18 @@
     }
 
     .register-card h3 {
-      color: #fff;
+      color: var(--text-primary);
       text-align: center;
       font-weight: 700;
       margin-bottom: 35px;
       font-size: 1.8rem;
       position: relative;
-      animation: titleGlow 3s ease-in-out infinite;
+      animation: titleGlow 4s ease-in-out infinite;
     }
 
     @keyframes titleGlow {
-      0%, 100% { text-shadow: 0 0 20px rgba(0, 224, 255, 0.3); }
-      50% { text-shadow: 0 0 30px rgba(0, 224, 255, 0.6), 0 0 40px rgba(0, 224, 255, 0.3); }
+      0%, 100% { text-shadow: 0 0 15px var(--glow-primary); }
+      50% { text-shadow: 0 0 25px var(--glow-primary), 0 0 35px var(--glow-primary); }
     }
 
     .form-group {
@@ -215,9 +231,9 @@
 
     .form-control {
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
       border-radius: 14px;
-      color: #fff;
+      color: var(--text-primary);
       font-size: 1rem;
       padding: 16px 20px;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -226,27 +242,27 @@
     }
 
     .form-control:focus {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: #00e0ff;
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--primary);
       box-shadow: 
-        0 0 0 4px rgba(0, 224, 255, 0.1),
-        0 8px 24px rgba(0, 224, 255, 0.2),
-        0 0 40px rgba(0, 224, 255, 0.1) inset;
+        0 0 0 4px var(--glow-primary),
+        0 8px 24px var(--glow-primary),
+        0 0 30px var(--glow-primary) inset;
       outline: none;
-      color: #fff;
+      color: var(--text-primary);
       transform: translateY(-2px);
     }
 
     .form-control::placeholder {
-      color: #666;
+      color: var(--text-secondary);
       transition: color 0.3s;
     }
 
     .form-control:focus::placeholder {
-      color: #888;
+      color: rgba(100, 116, 139, 0.7);
     }
 
-    /* Input field glow effect */
+    /* Enhanced input field glow effect */
     .input-wrapper {
       position: relative;
     }
@@ -258,7 +274,7 @@
       left: 50%;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #00e0ff, transparent);
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
       transform: translateX(-50%);
       transition: width 0.4s ease;
     }
@@ -269,11 +285,11 @@
 
     .btn-register {
       width: 100%;
-      background: linear-gradient(135deg, #00e0ff 0%, #0077ff 50%, #8a2be2 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--purple) 100%);
       background-size: 200% 200%;
       border: none;
       border-radius: 14px;
-      color: #fff;
+      color: var(--text-primary);
       font-size: 1.1rem;
       font-weight: 600;
       padding: 16px;
@@ -281,22 +297,22 @@
       position: relative;
       overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: buttonPulse 3s ease-in-out infinite;
-      box-shadow: 0 4px 20px rgba(0, 224, 255, 0.3);
+      animation: buttonPulse 4s ease-in-out infinite;
+      box-shadow: 0 4px 15px var(--glow-primary);
     }
 
     @keyframes buttonPulse {
       0%, 100% { 
         background-position: 0% 50%;
-        box-shadow: 0 4px 20px rgba(0, 224, 255, 0.3);
+        box-shadow: 0 4px 15px var(--glow-primary);
       }
       50% { 
         background-position: 100% 50%;
-        box-shadow: 0 4px 30px rgba(0, 224, 255, 0.5);
+        box-shadow: 0 4px 25px var(--glow-primary);
       }
     }
 
-    /* Glowing sweep effect */
+    /* Enhanced glowing sweep effect */
     .btn-register::before {
       content: '';
       position: absolute;
@@ -307,10 +323,10 @@
       background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.3),
         transparent
       );
-      transition: left 0.6s;
+      transition: left 0.7s;
     }
 
     .btn-register:hover::before {
@@ -320,19 +336,19 @@
     .btn-register:hover {
       transform: translateY(-3px) scale(1.02);
       box-shadow: 
-        0 8px 35px rgba(0, 224, 255, 0.5),
-        0 0 60px rgba(0, 224, 255, 0.3);
+        0 8px 25px var(--glow-primary),
+        0 0 50px var(--glow-primary);
     }
 
     .btn-register:active {
       transform: translateY(-1px) scale(0.98);
     }
 
-    /* Ripple effect */
+    /* Enhanced ripple effect */
     .ripple {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.4);
       transform: scale(0);
       animation: rippleEffect 0.6s ease-out;
       pointer-events: none;
@@ -348,7 +364,7 @@
     .signup-footer {
       text-align: center;
       margin-top: 30px;
-      color: #999;
+      color: var(--text-secondary);
       font-size: 0.95rem;
       animation: fadeIn 0.8s ease-out 0.5s backwards;
     }
@@ -359,7 +375,7 @@
     }
 
     .signup-footer a {
-      color: #00e0ff;
+      color: var(--primary);
       text-decoration: none;
       font-weight: 600;
       position: relative;
@@ -374,12 +390,12 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, #00e0ff, #0077ff);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
       transition: width 0.3s ease;
     }
 
     .signup-footer a:hover {
-      color: #00baff;
+      color: var(--accent);
       text-decoration: none;
       transform: translateX(3px);
     }
@@ -411,30 +427,45 @@
     }
 
     #msg.error {
-      background: rgba(255, 82, 82, 0.15);
-      border: 1px solid rgba(255, 82, 82, 0.4);
-      color: #ff5252;
+      background: rgba(255, 82, 82, 0.1);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+      color: var(--error);
       display: block;
-      box-shadow: 0 4px 20px rgba(255, 82, 82, 0.2);
+      box-shadow: 0 4px 15px rgba(255, 82, 82, 0.15);
     }
 
     #msg.success {
-      background: rgba(0, 224, 127, 0.15);
-      border: 1px solid rgba(0, 224, 127, 0.4);
-      color: #00e07f;
+      background: rgba(0, 208, 122, 0.1);
+      border: 1px solid rgba(0, 208, 122, 0.3);
+      color: var(--success);
       display: block;
-      box-shadow: 0 4px 20px rgba(0, 224, 127, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 208, 122, 0.15);
     }
 
-    /* Loading spinner enhancement */
+    /* Enhanced loading spinner */
     .spinner-border {
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
     }
 
-    /* Responsive */
-    @media (max-width: 576px) {
+    /* Enhanced Responsive Design */
+    @media (max-width: 768px) {
       .register-card {
         padding: 40px 30px;
+      }
+
+      .orb {
+        width: 400px !important;
+        height: 400px !important;
+      }
+
+      .register-card h3 {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .register-card {
+        padding: 35px 25px;
       }
 
       .orb {
@@ -445,11 +476,24 @@
       .register-card h3 {
         font-size: 1.5rem;
       }
+
+      .form-control {
+        padding: 14px 18px;
+      }
+
+      .btn-register {
+        padding: 14px;
+        font-size: 1rem;
+      }
     }
 
     @media (max-width: 380px) {
       .register-card {
         padding: 30px 20px;
+      }
+
+      .register-card h3 {
+        font-size: 1.4rem;
       }
     }
   </style>
@@ -589,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
           msgDiv.textContent = data || "✅ Registration successful! Redirecting...";
           
           // Celebration effect
-          submitBtn.style.background = 'linear-gradient(135deg, #00e07f, #00ff88)';
+          submitBtn.style.background = 'linear-gradient(135deg, #00d07a, #00ff88)';
           
           setTimeout(() => window.location.href = "/login.html", 1500);
         } else {
