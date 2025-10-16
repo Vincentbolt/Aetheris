@@ -39,7 +39,29 @@ public class AetherBotHelper {
 		return optionType;
 	}
 
-	
+	public String detectTrend(double[] opens, double[] highs, double[] lows, double[] closes) {
+        int bullishCount = 0, bearishCount = 0;
+
+        for (int i = 0; i < opens.length; i++) {
+            double body = Math.abs(closes[i] - opens[i]);
+            double wickHigh = highs[i] - Math.max(opens[i], closes[i]);
+            double wickLow = Math.min(opens[i], closes[i]) - lows[i];
+
+            if (closes[i] > opens[i] && body > (wickHigh + wickLow)) {
+                bullishCount++;
+            } else if (closes[i] < opens[i] && body > (wickHigh + wickLow)) {
+                bearishCount++;
+            }
+        }
+
+        if (bullishCount > bearishCount) {
+            return "Bullish";
+        } else if (bearishCount > bullishCount) {
+            return "Bearish";
+        } else {
+            return "Sideways";
+        }
+    }
 	
 	public List<Double> getInitialIndexCloses(JSONArray response1) {
 		List<Double> closes = new ArrayList<>();
@@ -375,16 +397,14 @@ public class AetherBotHelper {
 	}
 	
 	public void profitHit(String orderId, String niftyString, double atTheTimeOption, double marketPr, double targetValue, double stoplossValue, int quantity, double capitalUsed) {
-		double profitlossValue = marketPr - atTheTimeOption;
-		String stringValue = "PROFIT : " + Math.round(profitlossValue * (double)quantity);
+		//double profitlossValue = marketPr - atTheTimeOption;
 
 		logger.info("Target Hit. Entry Price: {} | Exit Price: {}", atTheTimeOption, marketPr);
 		//TradingBotUtil.sendTelegramMessage("🎯 Target Hit!\n" + "Symbol: " + niftyString + "\nEntry: ₹" + atTheTimeOption + "\nExit: ₹" + marketPr + "\n From AetherBot");	
 	}
 	
 	public void StopLossHit(String orderId, String niftyString, double atTheTimeOption, double marketPr, double targetValue, double stoplossValue, int quantity, double capitalUsed) {
-		double profitlossValue = atTheTimeOption - marketPr;
-		String stringValue = "LOSS : " + Math.round(profitlossValue * (double)quantity); 
+		//double profitlossValue = atTheTimeOption - marketPr;
 
 		logger.info("Stoploss Hit. Entry Price: {} | Exit Price: {}", atTheTimeOption, marketPr);
 		//TradingBotUtil.sendTelegramMessage("❌ Stoploss Hit!\n" + "Symbol: " + niftyString + "\nEntry: ₹" + atTheTimeOption + "\nExit: ₹" + marketPr + "\n From AetherBot");	

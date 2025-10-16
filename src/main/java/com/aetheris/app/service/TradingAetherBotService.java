@@ -337,26 +337,40 @@ public class TradingAetherBotService {
 			// Extract last 6 candles
 			List<Double> closes = new ArrayList<>();
 
+			double firstOpen= firstCandle.getDouble(1);
 			double firstHigh = firstCandle.getDouble(2);
 			double firstLow = firstCandle.getDouble(3);
-			double secondHigh = secondCandle.getDouble(2);
-			double secondLow = secondCandle.getDouble(3);
+			double firstClose = firstCandle.getDouble(4);
+			double secondOpen  = secondCandle.getDouble(1);
+			double secondHigh  = secondCandle.getDouble(2);
+			double secondLow   = secondCandle.getDouble(3);
+			double secondClose = secondCandle.getDouble(4);
+			
+			// Create arrays to hold the two candle data
+	        double[] opens  = { firstOpen, secondOpen };
+	        double[] highs  = { firstHigh, secondHigh };
+	        double[] lows   = { firstLow, secondLow };
+	        double[] fCloses = { firstClose, secondClose };
 
 			String optionType = null;
 			double avg = 0.0;
 			double diff = 0.0;
 			if (!positionTaken.get()) {
 				if (secondHigh > firstHigh && secondLow > firstLow) {
-					optionType = "CE";
-					diff = secondHigh - firstLow;
-					avg  = diff / 2;
+					String trend = botHelper.detectTrend(opens, highs, lows, fCloses);
+					if (trend.equalsIgnoreCase("Bullish")) {
+						optionType = "CE";
+						diff = secondHigh - firstLow;
+						avg  = diff / 2;
+					}
 				} else if (secondLow < firstLow && secondHigh < firstHigh) {
-					optionType = "PE";
-					diff = firstHigh - secondLow;
-					avg  = diff / 2;
+					String trend = botHelper.detectTrend(opens, highs, lows, fCloses);
+					if (trend.equalsIgnoreCase("Bearish")) {
+						optionType = "PE";
+						diff = firstHigh - secondLow;
+						avg  = diff / 2;
+					}
 				}
-				
-				targetPercent = calculateTargetPercent(indexType, avg);
 				
 				if(optionType == null) {
 					System.out.println("Index Basic Trend pattern not formed.");
@@ -364,6 +378,8 @@ public class TradingAetherBotService {
 					return;
 				}
 
+				targetPercent = calculateTargetPercent(indexType, avg);
+				
 				if (optionType != null) {
 					// ✅ RSI Filter
 					JSONArray currentResponse = fetchMarketCurrentValue(smartConnect);
