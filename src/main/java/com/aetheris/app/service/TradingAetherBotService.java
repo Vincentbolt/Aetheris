@@ -342,13 +342,6 @@ public class TradingAetherBotService {
 			double secondHigh = secondCandle.getDouble(2);
 			double secondLow = secondCandle.getDouble(3);
 
-			boolean sideways = botHelper.isSidewaysMarket(response1, indexType);
-			if (sideways) {
-			    System.out.println("Market is sideways. Skipping trade execution.");
-			    cooldownMillis = 300_000L;
-			    return;
-			}
-
 			String optionType = null;
 			double avg = 0.0;
 			double diff = 0.0;
