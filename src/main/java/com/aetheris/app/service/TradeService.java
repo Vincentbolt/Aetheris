@@ -109,12 +109,12 @@ public class TradeService {
         	    // Use dummy value in development
         	    availableCash = 0.0;
         	} else {
-        	    SmartConnect smartConnect = botService.createSmartConnect(totpKey, apiKey, clientId, password);
-        	    JSONObject response = smartConnect.getRMS();
+//        	    SmartConnect smartConnect = botService.createSmartConnect(totpKey, apiKey, clientId, password);
+//        	    JSONObject response = smartConnect.getRMS();
 
-        	    if (response != null && response.has("availablecash") && !response.isNull("availablecash")) {
-        	        availableCash = Double.parseDouble(response.getString("availablecash"));
-        	    }
+//        	    if (response != null && response.has("availablecash") && !response.isNull("availablecash")) {
+//        	        availableCash = Double.parseDouble(response.getString("availablecash"));
+//        	    }
         	}
         	Trade tradeExist = existingTrades.get(0);
         	tradeExist.setAvailableCash(availableCash);
@@ -153,12 +153,12 @@ public class TradeService {
         	String clientId = settings.getClientId();
         	String password = settings.getPassword();
 
-        	SmartConnect smartConnect = botService.createSmartConnect(totpKey, apiKey, clientId, password);
-        	JSONObject response = smartConnect.getRMS();
+        	//SmartConnect smartConnect = botService.createSmartConnect(totpKey, apiKey, clientId, password);
+        	//JSONObject response = smartConnect.getRMS();
         	
-        	if (response != null && response.has("availablecash") && !response.isNull("availablecash")) {
-        		availableCash = Double.parseDouble(response.getString("availablecash"));
-        	}
+//        	if (response != null && response.has("availablecash") && !response.isNull("availablecash")) {
+//        		availableCash = Double.parseDouble(response.getString("availablecash"));
+//        	}
         	Trade tradeExist = trades.get(0);
         	tradeExist.setAvailableCash(availableCash);
         	tradeRepository.save(tradeExist);
