@@ -412,7 +412,7 @@ public class TradingAetherBotService {
 				    }
 				}
 				
-				if(optionType == null && confirmTrend) {
+				if(optionType == null && !confirmTrend) {
 					logger.info("Index Basic Trend pattern not formed.");
 					isFromOrder = true;
 					cooldownMillis = 300_000L;
