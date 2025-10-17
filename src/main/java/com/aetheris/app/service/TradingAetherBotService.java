@@ -643,6 +643,17 @@ public class TradingAetherBotService {
 								}
 							}
 
+							JSONArray lastOneMinuteOfOption = fetchLastOneMinuteCandle(optionToken, smartConnect);
+							JSONArray lastOneMinuteCandle = lastOneMinuteOfOption.getJSONArray(lastOneMinuteOfOption.length() - 1); 
+							
+							double open  = lastOneMinuteCandle.getDouble(1);
+							double close = lastOneMinuteCandle.getDouble(4);
+							
+							if (open > close) {
+								logger.warn("One Minute Trend Confirmation failed");
+								cooldownMillis = 1_000L;
+								return;
+							}
 
 							int maxLots = (int) (capitalAmount / (atTheTimeOption * lotSize));
 							int quantity = Math.min(maxLots * lotSize, indServices.getMaxQuantityForIndex(indexType));
@@ -863,6 +874,30 @@ public class TradingAetherBotService {
 		} catch (Exception e) {
 			logger.error("Error in executeStrategy: ", e);
 		}
+	}
+	
+	private JSONArray fetchLastOneMinuteCandle(String optionToken, SmartConnect  smartConnect) {
+	    JSONObject request = new JSONObject();
+	    request.put("exchange", exchangeOption);
+	    request.put("symboltoken", optionToken);
+	    request.put("interval", "ONE_MINUTE");
+
+	    // Use Indian market timezone
+	    LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata")).truncatedTo(ChronoUnit.MINUTES);
+
+	    // 'toTime' is the latest completed minute candle
+	    LocalDateTime toTime = now;
+	    LocalDateTime fromTime = toTime.minusMinutes(2); // get last 1-2 minute range
+
+	    request.put("fromdate", fromTime.format(formatter));
+	    request.put("todate", toTime.format(formatter));
+
+	    try {
+	        return smartConnect.candleData(request);
+	    } catch (Exception e) {
+	        logger.error("Error fetching 1-minute candle for token {}: {}", optionToken, e.getMessage(), e);
+	        return null;
+	    }
 	}
 	
 	public Long saveTradeEntry(String niftyString, double entryPrice, User userId) {
