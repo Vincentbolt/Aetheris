@@ -382,7 +382,6 @@ public class TradingAetherBotService {
 					}
 				}
 				
-				boolean confirmTrend = false;
 
 				if (optionType != null && (optionType.equalsIgnoreCase("CE") || optionType.equalsIgnoreCase("PE"))) {
 
@@ -399,20 +398,20 @@ public class TradingAetherBotService {
 				    // Check trend
 				    if (optionType.equalsIgnoreCase("CE")) {
 				        if (secondClose >= secondOpen + threshold) {
-				            confirmTrend = true;
+				        	optionType = "CE";
 				        } else {
 				            optionType = null;
 				        }
 				    } else { // PE
 				        if (secondOpen >= secondClose + threshold) {
-				            confirmTrend = true;
+				        	optionType = "PE";
 				        } else {
 				            optionType = null;
 				        }
 				    }
 				}
 				
-				if(optionType == null && !confirmTrend) {
+				if(optionType == null) {
 					logger.info("Index Basic Trend pattern not formed.");
 					isFromOrder = true;
 					cooldownMillis = 300_000L;
