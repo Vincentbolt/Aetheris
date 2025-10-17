@@ -419,6 +419,7 @@ public class TradingAetherBotService {
 					return;
 				}
 
+				
 				targetPercent = calculateTargetPercent(indexType, avg);
 				
 				if (optionType != null) {
