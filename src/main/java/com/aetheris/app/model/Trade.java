@@ -2,6 +2,7 @@ package com.aetheris.app.model;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "trades")
@@ -28,7 +29,7 @@ public class Trade {
     private Double profitOrLossPercent; // +2.5 / -1.2 etc.
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
 
     // getters/setters
     public Long getId() {
