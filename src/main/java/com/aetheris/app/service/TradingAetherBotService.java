@@ -307,6 +307,7 @@ public class TradingAetherBotService {
     
 	private void executeStrategy(SmartConnect smartConnect, User userId) {
 		try {
+			isFromOrder = false;
 			System.out.println("Execute Strategy: " + "Running");
 			long nowIstMillis = Instant.now().atZone(ZoneId.of("Asia/Kolkata")).toInstant().toEpochMilli();
 
