@@ -66,8 +66,8 @@ public class TradingAetherBotService {
     private long lastOptionDataFetchTime = 0;
     private JSONArray cachedNiftyTradeValue = null;
     private JSONArray cachedOptionData = null;
-    private static final int startHour = 9;
-    private static final int startMinutes = 46;
+    private static int startHour = 9;
+    private static int startMinutes = 46;
 	private boolean checkVolatalityCriteria = false;
 	private String indexType = null;
 	private String expiryDateWithMonthyear = null;
@@ -94,6 +94,10 @@ public class TradingAetherBotService {
     private TradeRepository tradeRepository;
 	
 	private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
+	
+	private boolean isFromOrder = false;
+	
+	private static ZonedDateTime nextTriggerTime = null;
 	
 	@Value("${app.back-test:false}") // default to false
     private boolean backTestOnly;
@@ -165,7 +169,7 @@ public class TradingAetherBotService {
 	    System.out.println("Starting Strategy");
 
 	    ZoneId istZone = ZoneId.of("Asia/Kolkata");
-	    ZonedDateTime nextTriggerTime = getNextTriggerTime(ZonedDateTime.now(istZone));
+	    nextTriggerTime = getNextTriggerTime(ZonedDateTime.now(istZone));
 
 	    // ✅ Guard against multiple starts
 	    if (scheduler != null && !scheduler.isShutdown()) {
@@ -197,6 +201,11 @@ public class TradingAetherBotService {
 
 	            // ✅ Current IST time
 	            ZonedDateTime now = ZonedDateTime.now(istZone);
+	            if (isFromOrder) {
+	            	nextTriggerTime = getNextTriggerTime(ZonedDateTime.now(istZone));
+	            	startHour = now.getHour();
+	            	startMinutes = now.getMinute();
+	            }
 	            ZonedDateTime startTime = now.withHour(startHour).withMinute(startMinutes).withSecond(0).withNano(0);
 
 	            // ✅ If strategy not started yet, wait until startTime
@@ -374,6 +383,7 @@ public class TradingAetherBotService {
 				
 				if(optionType == null) {
 					System.out.println("Index Basic Trend pattern not formed.");
+					isFromOrder = true;
 					cooldownMillis = 300_000L;
 					return;
 				}
