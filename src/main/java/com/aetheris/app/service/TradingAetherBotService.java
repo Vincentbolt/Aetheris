@@ -645,6 +645,7 @@ public class TradingAetherBotService {
 										positionTaken.set(false);
 										reached.set(false);
 										cooldownMillis = 300_000L;
+										isFromOrder = true;
 										break;
 									} else if (marketPr <= stoplossValue) {
 										capitalUsed = marketPr * quantity;
@@ -652,6 +653,7 @@ public class TradingAetherBotService {
 										positionTaken.set(false);
 										reached.set(false);
 										cooldownMillis = 300_000L;
+										isFromOrder = true;
 										break;
 									}
 									try {
@@ -802,6 +804,7 @@ public class TradingAetherBotService {
 											positionTaken.set(false);
 											reached.set(false);
 											cooldownMillis = 300_000L;
+											isFromOrder = true;
 											break;
 										} else if (marketPr <= stoplossValue) {
 											capitalUsed = marketPr * quantity;
@@ -809,6 +812,7 @@ public class TradingAetherBotService {
 											positionTaken.set(false);
 											reached.set(false);
 											cooldownMillis = 300_000L;
+											isFromOrder = true;
 											break;
 										}
 										try {
