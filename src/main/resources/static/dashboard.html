@@ -1657,7 +1657,7 @@
       <!-- Right: Hello + Stats + Recent Trades -->
       <div class="col-lg-8 col-md-7 mb-4">
         <!-- Hello + Capital Warning -->
-        <div class="glass-card mb-4 animate-fade-in-up delay-1">
+        <div class="glass-card mb-4 animate-fade-in-up">
           <h5 id="hello">Hello, Trader</h5>
           <p id="capital" style="color: #ffc107; font-weight: 500;">⚠️
             Please ensure sufficient capital is available in your Angel One
@@ -1722,6 +1722,21 @@
                 <div class="stat-label">Today's P&L</div>
                 <div class="stat-value" style="color: #00e07f;">+₹12,450</div>
                 <div class="stat-change">+2.49%</div>
+              </div>
+            </div>
+
+            <!-- New Total P&L Card -->
+            <div class="stat-card animate-fade-in-up delay-6">
+              <div class="stat-icon"
+                style="background: rgba(0, 123, 255, 0.1);">
+                <svg width="24" height="24" fill="#007bff" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-label">Total P&L</div>
+                <div class="stat-value" id="totalPLValue" style="color: #00e07f;">+₹0</div>
+                <div class="stat-change" id="totalPLPercent">+0%</div>
               </div>
             </div>
           </div>
@@ -1904,6 +1919,33 @@
         if (winRateCard) {
             winRateCard.querySelector('.stat-value').textContent = `${winRatePercent}%`;
             winRateCard.querySelector('.stat-change').textContent = `${winningTradesCount}/${totalTradesCount} wins`;
+        }
+
+        // Calculate and update Total P&L
+        let totalPL = 0;
+        let totalInvestment = 0;
+        
+        allTrades.forEach(trade => {
+            const profitOrLoss = trade.exitPrice - trade.entryPrice;
+            totalPL += profitOrLoss;
+            totalInvestment += trade.entryPrice;
+        });
+
+        const totalPLElement = document.getElementById('totalPLValue');
+        const totalPLPercentElement = document.getElementById('totalPLPercent');
+        
+        if (totalPLElement && totalPLPercentElement) {
+            totalPLElement.textContent = `${totalPL >= 0 ? '+' : ''}₹${totalPL.toFixed(2)}`;
+            const totalPLPercent = totalInvestment > 0 ? (totalPL / totalInvestment) * 100 : 0;
+            totalPLPercentElement.textContent = `${totalPLPercent >= 0 ? '+' : ''}${totalPLPercent.toFixed(2)}%`;
+            
+            if (totalPL >= 0) {
+                totalPLElement.style.color = "#00e07f";
+                totalPLPercentElement.style.color = "#00e07f";
+            } else {
+                totalPLElement.style.color = "#ff4444";
+                totalPLPercentElement.style.color = "#ff4444";
+            }
         }
     }
 
